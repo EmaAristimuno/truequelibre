@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Recycle, Plus, User } from "lucide-react";
+import { Recycle, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { logout } from "@/lib/actions/auth";
+import { UserMenu } from "@/components/user-menu";
 
 export async function Header() {
   const supabase = await createClient();
@@ -43,34 +43,7 @@ export async function Header() {
 
         <div className="flex items-center gap-3">
           {user ? (
-            <>
-              <Link
-                href="/perfil"
-                className="hidden items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-stone-900 sm:flex"
-              >
-                <User className="h-4 w-4" />
-                {username ?? "Mi perfil"}
-              </Link>
-              <Link
-                href="/matches"
-                className="hidden text-sm font-medium text-stone-600 hover:text-stone-900 sm:inline"
-              >
-                Mis trueques
-              </Link>
-              {isAdmin && (
-                <Link
-                  href="/admin/finanzas"
-                  className="hidden text-sm font-medium text-stone-600 hover:text-stone-900 sm:inline"
-                >
-                  Admin
-                </Link>
-              )}
-              <form action={logout}>
-                <button className="text-sm font-medium text-stone-600 hover:text-stone-900">
-                  Salir
-                </button>
-              </form>
-            </>
+            <UserMenu username={username ?? "Mi perfil"} isAdmin={isAdmin} />
           ) : (
             <Link
               href="/login"
