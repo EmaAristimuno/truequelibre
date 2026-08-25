@@ -14,7 +14,12 @@ const STATUS_BADGE_CLASS: Record<string, string> = {
   cancelled: "bg-red-50 text-red-600",
 };
 
-export default async function PerfilPage() {
+export default async function PerfilPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ deleted?: string }>;
+}) {
+  const params = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
   const user = data.user;
@@ -76,6 +81,12 @@ export default async function PerfilPage() {
         Mis publicaciones
       </h2>
 
+      {params.deleted && (
+        <p className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+          Publicación eliminada.
+        </p>
+      )}
+
       {items.length === 0 && (
         <p className="mt-3 text-sm text-stone-500">
           Todavía no publicaste ningún objeto.
@@ -84,9 +95,10 @@ export default async function PerfilPage() {
 
       <div className="mt-4 flex flex-col gap-3">
         {items.map((item) => (
-          <div
+          <Link
             key={item.id}
-            className="flex items-center gap-4 rounded-2xl border border-stone-200 bg-white p-4"
+            href={`/items/${item.id}`}
+            className="flex items-center gap-4 rounded-2xl border border-stone-200 bg-white p-4 transition-colors hover:border-emerald-300"
           >
             <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-stone-100 text-2xl">
               {item.imageUrl ? (
@@ -110,7 +122,7 @@ export default async function PerfilPage() {
             >
               {STATUS_LABEL[item.status]}
             </span>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

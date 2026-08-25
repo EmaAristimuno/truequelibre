@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createItem } from "@/lib/actions/items";
 import { CATEGORIES } from "@/lib/categories";
 import { CONDITION_LABEL } from "@/lib/types";
+import { ImageUploader } from "@/components/image-uploader";
 
 export default async function PublicarPage({
   searchParams,
@@ -62,13 +63,7 @@ export default async function PublicarPage({
           <label className="mb-1 block text-sm font-medium text-stone-700">
             Fotos (hasta 4, opcional)
           </label>
-          <input
-            type="file"
-            name="images"
-            accept="image/*"
-            multiple
-            className="block w-full text-sm text-stone-600 file:mr-3 file:rounded-full file:border-0 file:bg-emerald-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-emerald-700 hover:file:bg-emerald-100"
-          />
+          <ImageUploader />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
