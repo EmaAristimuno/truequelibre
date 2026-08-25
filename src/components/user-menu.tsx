@@ -30,9 +30,9 @@ export function UserMenu({
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-stone-900"
+        className="flex items-center gap-1.5 text-sm font-medium text-ink/70 hover:text-ink"
       >
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-stone-200 text-stone-700">
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-pine/15 text-pine-dark">
           <User className="h-4 w-4" />
         </span>
         <span className="hidden sm:inline">{username}</span>
@@ -42,40 +42,40 @@ export function UserMenu({
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-30 mt-2 w-52 overflow-hidden rounded-xl border border-stone-200 bg-white py-1 shadow-lg">
+        <div className="absolute right-0 top-full z-30 mt-2 w-52 overflow-hidden rounded-xl border border-ink/10 bg-white py-1 shadow-lg">
           <Link
             href="/perfil"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-2 px-4 py-2 text-sm text-stone-700 hover:bg-stone-50"
+            className="flex items-center gap-2 px-4 py-2 text-sm text-ink/80 hover:bg-paper"
           >
-            <User className="h-4 w-4 text-stone-400" />
+            <User className="h-4 w-4 text-ink/40" />
             Mi perfil
           </Link>
           <Link
             href="/matches"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-2 px-4 py-2 text-sm text-stone-700 hover:bg-stone-50"
+            className="flex items-center gap-2 px-4 py-2 text-sm text-ink/80 hover:bg-paper"
           >
-            <Repeat className="h-4 w-4 text-stone-400" />
+            <Repeat className="h-4 w-4 text-ink/40" />
             Mis trueques
           </Link>
           {isAdmin && (
             <Link
               href="/admin/finanzas"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-stone-700 hover:bg-stone-50"
+              className="flex items-center gap-2 px-4 py-2 text-sm text-ink/80 hover:bg-paper"
             >
-              <ShieldCheck className="h-4 w-4 text-stone-400" />
+              <ShieldCheck className="h-4 w-4 text-ink/40" />
               Admin
             </Link>
           )}
-          <div className="my-1 border-t border-stone-100" />
+          <div className="my-1 border-t border-ink/10" />
           <form action={logout}>
             <button
               type="submit"
-              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-stone-700 hover:bg-stone-50"
+              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-ink/80 hover:bg-paper"
             >
-              <LogOut className="h-4 w-4 text-stone-400" />
+              <LogOut className="h-4 w-4 text-ink/40" />
               Salir
             </button>
           </form>

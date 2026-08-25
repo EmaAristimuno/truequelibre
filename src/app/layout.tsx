@@ -1,17 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Work_Sans, Space_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { Header } from "@/components/header";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const displayFont = Fraunces({
+  variable: "--font-display",
+  subsets: ["latin"],
+  axes: ["opsz", "SOFT", "WONK"],
+  style: ["normal", "italic"],
+});
+
+const bodyFont = Work_Sans({
+  variable: "--font-body",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const dataFont = Space_Mono({
+  variable: "--font-data",
   subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -24,9 +32,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${displayFont.variable} ${bodyFont.variable} ${dataFont.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-stone-50">
+      <body className="min-h-full flex flex-col bg-paper font-body text-ink">
         <Header />
         {children}
         <Toaster position="top-center" richColors />

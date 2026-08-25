@@ -1,26 +1,35 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Paleta propia de TruequeLibre — mercado de trueque, no un SaaS genérico. */
+  --color-paper: #f5f1e6;
+  --color-paper-dim: #ece5d3;
+  --color-ink: #23281f;
+  --color-pine: #2b5c4b;
+  --color-pine-dark: #1c463a;
+  --color-clay: #c1602b;
+  --color-clay-dark: #9c4a1f;
+  --color-gold: #d6a24c;
+  --color-moss: #a9b79e;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-paper: var(--color-paper);
+  --color-paper-dim: var(--color-paper-dim);
+  --color-ink: var(--color-ink);
+  --color-pine: var(--color-pine);
+  --color-pine-dark: var(--color-pine-dark);
+  --color-clay: var(--color-clay);
+  --color-clay-dark: var(--color-clay-dark);
+  --color-gold: var(--color-gold);
+  --color-moss: var(--color-moss);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-data: var(--font-data);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
 }

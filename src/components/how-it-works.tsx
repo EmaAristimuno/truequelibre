@@ -23,27 +23,34 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <section
-      id="como-funciona"
-      className="border-t border-stone-200 bg-white py-14"
-    >
+    <section id="como-funciona" className="border-t border-ink/10 bg-white py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <h2 className="text-center text-2xl font-bold text-stone-900">
-          Cómo funciona
-        </h2>
-        <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-3">
+        <div className="text-center">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-clay">
+            El circuito
+          </span>
+          <h2 className="mt-1 font-display text-3xl font-semibold text-ink">
+            Cómo funciona
+          </h2>
+        </div>
+
+        <div className="relative mt-12 grid grid-cols-1 gap-10 sm:grid-cols-3">
+          <div
+            aria-hidden
+            className="absolute left-0 right-0 top-7 hidden h-px bg-gradient-to-r from-transparent via-moss to-transparent sm:block"
+          />
           {STEPS.map((step, index) => (
             <div key={step.title} className="relative text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
-                <step.icon className="h-7 w-7" />
+              <div className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-pine bg-paper text-pine-dark">
+                <step.icon className="h-6 w-6" />
               </div>
-              <span className="mt-3 block text-xs font-semibold text-amber-600">
-                Paso {index + 1}
+              <span className="mt-4 block font-data text-xs font-bold tracking-wide text-gold">
+                {String(index + 1).padStart(2, "0")}
               </span>
-              <h3 className="mt-1 text-base font-semibold text-stone-900">
+              <h3 className="mt-1 font-display text-lg font-semibold text-ink">
                 {step.title}
               </h3>
-              <p className="mx-auto mt-2 max-w-xs text-sm text-stone-600">
+              <p className="mx-auto mt-2 max-w-xs text-sm text-ink/60">
                 {step.description}
               </p>
             </div>
