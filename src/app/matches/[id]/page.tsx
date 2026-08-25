@@ -4,8 +4,15 @@ import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getMatchById } from "@/lib/queries/matches";
 import { getMatchMessages } from "@/lib/queries/messages";
-import { acceptMatch } from "@/lib/actions/matches";
+import { MatchActions } from "@/components/match-actions";
 import { ChatPanel } from "@/components/chat-panel";
+
+const STATUS_LABEL: Record<string, string> = {
+  proposed: "Propuesto",
+  accepted: "Aceptado",
+  completed: "Completado",
+  cancelled: "Cancelado",
+};
 
 export default async function MatchDetailPage({
   params,
@@ -34,15 +41,6 @@ export default async function MatchDetailPage({
     participantNames[leg.receiverId] = leg.receiverName;
   });
 
-  const myLegs = match.legs.filter(
-    (leg) => leg.giverId === user.id || leg.receiverId === user.id,
-  );
-  const iAlreadyConfirmed = myLegs.every(
-    (leg) =>
-      (leg.giverId !== user.id || leg.giverConfirmed) &&
-      (leg.receiverId !== user.id || leg.receiverConfirmed),
-  );
-
   return (
     <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
       <Link
@@ -61,11 +59,7 @@ export default async function MatchDetailPage({
               : `Cadena de ${match.legs.length}`}
           </span>
           <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-600">
-            {match.status === "proposed"
-              ? "Propuesto"
-              : match.status === "accepted"
-                ? "Aceptado"
-                : match.status}
+            {STATUS_LABEL[match.status] ?? match.status}
           </span>
         </div>
 
@@ -80,26 +74,16 @@ export default async function MatchDetailPage({
               <span className="font-medium">{leg.receiverName}</span>
               <span className="text-stone-400">·</span>
               <span>{leg.itemTitle}</span>
-              {leg.giverConfirmed && leg.receiverConfirmed && (
+              {leg.giverReceived && leg.receiverReceived && (
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
               )}
             </div>
           ))}
         </div>
 
-        {match.status === "proposed" && !iAlreadyConfirmed && (
-          <form action={acceptMatch} className="mt-4">
-            <input type="hidden" name="match_id" value={match.id} />
-            <button className="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800">
-              Aceptar trueque
-            </button>
-          </form>
-        )}
-        {iAlreadyConfirmed && match.status === "proposed" && (
-          <p className="mt-4 text-sm text-stone-500">
-            Ya confirmaste. Esperando al resto de las partes.
-          </p>
-        )}
+        <div className="mt-4">
+          <MatchActions match={match} userId={user.id} />
+        </div>
       </div>
 
       <ChatPanel

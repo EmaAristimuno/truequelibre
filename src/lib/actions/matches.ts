@@ -41,3 +41,46 @@ export async function acceptMatch(formData: FormData) {
 
   revalidatePath("/matches");
 }
+
+export async function confirmDelivery(formData: FormData) {
+  const matchId = String(formData.get("match_id") ?? "");
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+
+  if (!userData.user) {
+    redirect("/login?next=/matches");
+  }
+  const userId = userData.user.id;
+
+  await supabase
+    .from("match_legs")
+    .update({ giver_received: true })
+    .eq("match_id", matchId)
+    .eq("giver_id", userId);
+
+  await supabase
+    .from("match_legs")
+    .update({ receiver_received: true })
+    .eq("match_id", matchId)
+    .eq("receiver_id", userId);
+
+  const { data: legs } = await supabase
+    .from("match_legs")
+    .select("item_id, giver_received, receiver_received")
+    .eq("match_id", matchId);
+
+  const allReceived = legs?.every(
+    (leg) => leg.giver_received && leg.receiver_received,
+  );
+
+  if (legs && allReceived) {
+    await supabase.from("matches").update({ status: "completed" }).eq("id", matchId);
+    await supabase
+      .from("items")
+      .update({ status: "completed" })
+      .in("id", legs.map((leg) => leg.item_id));
+  }
+
+  revalidatePath("/matches");
+  revalidatePath(`/matches/${matchId}`);
+}

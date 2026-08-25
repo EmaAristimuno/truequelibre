@@ -77,7 +77,14 @@ Cuando el algoritmo genera una propuesta, cada participante la ve en su sección
 - El trueque queda con estado **Propuesto** hasta que **todas** las partes confirmen.
 - Cuando todos confirman, el estado pasa a **Aceptado**.
 
-**Pendiente de definir/construir:** qué pasa después de "Aceptado" — hoy no hay un paso de confirmación de entrega física ("nos encontramos y me lo dieron"), ni una forma de cancelar o rechazar una propuesta desde la interfaz. El objeto queda "En trueque" indefinidamente si nadie completa el circuito. Esto es lo primero a definir en la próxima iteración de negocio (ver sección 8).
+### 5.1 Confirmación de entrega (segundo paso)
+
+Una vez que un trueque está **Aceptado**, las partes coordinan por el chat interno el punto de encuentro. Cuando el intercambio físico ya ocurrió:
+
+- Cada usuario presiona **"Confirmar que recibí mi objeto"**.
+- Cuando **todas** las partes de la cadena confirmaron haber recibido lo suyo, el trueque pasa a estado **Completado**, y los objetos involucrados también quedan marcados como **Completado** (dejan de estar "En trueque").
+
+**Pendiente de definir/construir:** todavía no existe una forma de **cancelar o rechazar** una propuesta desde la interfaz — si alguien no confirma nunca (ni la aceptación ni la entrega), el trueque queda indefinidamente en ese estado y el objeto sigue reservado. Tampoco hay un mecanismo de disputa si una parte dice haber entregado y la otra lo niega.
 
 ---
 
@@ -101,12 +108,12 @@ Cuando el algoritmo genera una propuesta, cada participante la ve en su sección
 
 Estas son las piezas de la lógica de negocio original que **todavía no están resueltas** en el producto:
 
-1. **Confirmación de entrega**: un segundo paso posterior a "Aceptado", donde cada parte confirma "recibí el objeto y está conforme" antes de cerrar el trueque como Completado y habilitar la calificación.
-2. **Cancelación / rechazo de una propuesta**: hoy no existe manera de rechazar un match propuesto; el objeto queda reservado indefinidamente.
-3. **Calificación post-trueque**: UI para que cada parte califique a las demás.
-4. **Monetización**: sin definir todavía a nivel de producto. Se discutieron ideas (destacar publicaciones, compensación en efectivo sobre trueques desiguales, servicios de verificación/seguro) pero no hay nada construido.
-5. **Rol de administrador / moderación**: no existe un panel para gestionar usuarios, publicaciones reportadas o disputas.
-6. **Notificaciones**: no hay aviso (email, push) cuando se genera una propuesta de trueque o llega un mensaje nuevo — el usuario tiene que entrar a la app para enterarse.
+1. **Cancelación / rechazo de una propuesta**: hoy no existe manera de rechazar un match propuesto; el objeto queda reservado indefinidamente si nadie avanza.
+2. **Calificación post-trueque**: UI para que cada parte califique a las demás una vez completado (el campo ya existe en la base, falta la pantalla).
+3. **Monetización**: sin definir todavía a nivel de producto. Se discutieron ideas (destacar publicaciones, compensación en efectivo sobre trueques desiguales, servicios de verificación/seguro) pero no hay nada construido.
+4. **Rol de administrador / moderación**: no existe un panel para gestionar usuarios, publicaciones reportadas o disputas.
+5. **Notificaciones**: no hay aviso (email, push) cuando se genera una propuesta de trueque, llega un mensaje nuevo, o alguien confirma su parte — el usuario tiene que entrar a la app para enterarse.
+6. **Resolución de disputas**: si una parte confirma "recibí mi objeto" y otra no, o hay desacuerdo sobre el estado de un objeto entregado, no hay ningún mecanismo de mediación.
 
 ---
 

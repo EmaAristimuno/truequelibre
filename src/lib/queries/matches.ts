@@ -12,6 +12,8 @@ export interface MatchLegView {
   receiverName: string;
   giverConfirmed: boolean;
   receiverConfirmed: boolean;
+  giverReceived: boolean;
+  receiverReceived: boolean;
 }
 
 export interface MatchView {
@@ -28,6 +30,8 @@ async function enrichLegs(
     receiver_id: string;
     giver_confirmed: boolean;
     receiver_confirmed: boolean;
+    giver_received: boolean;
+    receiver_received: boolean;
   }[],
 ): Promise<MatchLegView[]> {
   const itemIds = [...new Set(legs.map((leg) => leg.item_id))];
@@ -57,8 +61,13 @@ async function enrichLegs(
     receiverName: nameById.get(leg.receiver_id) ?? "Usuario",
     giverConfirmed: leg.giver_confirmed,
     receiverConfirmed: leg.receiver_confirmed,
+    giverReceived: leg.giver_received,
+    receiverReceived: leg.receiver_received,
   }));
 }
+
+const LEG_COLUMNS =
+  "item_id, giver_id, receiver_id, giver_confirmed, receiver_confirmed, giver_received, receiver_received";
 
 export async function getMyMatches(userId: string): Promise<MatchView[]> {
   const supabase = await createClient();
@@ -79,9 +88,7 @@ export async function getMyMatches(userId: string): Promise<MatchView[]> {
 
   const { data: allLegs } = await supabase
     .from("match_legs")
-    .select(
-      "match_id, item_id, giver_id, receiver_id, giver_confirmed, receiver_confirmed",
-    )
+    .select(`match_id, ${LEG_COLUMNS}`)
     .in("match_id", matchIds);
 
   if (!matches || !allLegs) return [];
@@ -111,7 +118,7 @@ export async function getMatchById(matchId: string): Promise<MatchView | null> {
 
   const { data: legs } = await supabase
     .from("match_legs")
-    .select("item_id, giver_id, receiver_id, giver_confirmed, receiver_confirmed")
+    .select(LEG_COLUMNS)
     .eq("match_id", matchId);
 
   if (!legs || legs.length === 0) return null;
