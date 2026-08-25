@@ -27,4 +27,5 @@ export interface Item {
   ownerName: string;
   ownerLocation: string;
   ownerRating: number;
+  distanceKm?: number;
 }

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_EMOJI } from "@/lib/categories";
+import { haversineKm } from "@/lib/distance";
 import type { Item, ItemCondition } from "@/lib/types";
 
 export async function getAvailableItems(): Promise<Item[]> {
@@ -16,13 +17,31 @@ export async function getAvailableItems(): Promise<Item[]> {
   const ownerIds = [...new Set(items.map((item) => item.owner_id))];
   const { data: profiles } = await supabase
     .from("profiles")
-    .select("id, username, location, rating")
+    .select("id, username, location, rating, latitude, longitude")
     .in("id", ownerIds);
 
   const profileById = new Map(profiles?.map((profile) => [profile.id, profile]));
 
+  const { data: userData } = await supabase.auth.getUser();
+  let viewerCoords: { lat: number; lng: number } | null = null;
+  if (userData.user) {
+    const { data: viewerProfile } = await supabase
+      .from("profiles")
+      .select("latitude, longitude")
+      .eq("id", userData.user.id)
+      .single();
+    if (viewerProfile?.latitude != null && viewerProfile?.longitude != null) {
+      viewerCoords = { lat: viewerProfile.latitude, lng: viewerProfile.longitude };
+    }
+  }
+
   return items.map((item) => {
     const profile = profileById.get(item.owner_id);
+    const ownerCoords =
+      profile?.latitude != null && profile?.longitude != null
+        ? { lat: profile.latitude, lng: profile.longitude }
+        : null;
+
     return {
       id: item.id,
       title: item.title,
@@ -34,6 +53,8 @@ export async function getAvailableItems(): Promise<Item[]> {
       ownerName: profile?.username ?? "Usuario",
       ownerLocation: profile?.location ?? "Sin ubicación",
       ownerRating: profile?.rating ?? 0,
+      distanceKm:
+        viewerCoords && ownerCoords ? haversineKm(viewerCoords, ownerCoords) : undefined,
     };
   });
 }

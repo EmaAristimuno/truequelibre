@@ -115,6 +115,16 @@ No hace falta que todas las partes estén de acuerdo para cancelar: **alcanza co
 
 ---
 
+## 7.1 Ubicación y cercanía
+
+- Cada usuario puede setear su ubicación desde su perfil: buscando una dirección, usando la ubicación de su dispositivo, o tocando directamente un mapa (OpenStreetMap, gratuito, sin costo por volumen de uso a diferencia de Google Maps).
+- Al marcar el punto en el mapa, la dirección se completa sola (geocodificación inversa); también funciona al revés, escribiendo una dirección se ubica el punto en el mapa.
+- Cuando tanto el usuario que navega como el dueño de un objeto tienen ubicación cargada, el feed muestra la **distancia aproximada** entre ambos en cada tarjeta.
+- **Todavía no afecta al algoritmo de matching**: hoy la cercanía es solo informativa en el feed. Incorporarla como criterio del algoritmo (por ejemplo, priorizar trueques con menor distancia total, o permitir un radio máximo configurable) es una decisión de producto pendiente de definir contigo.
+- Un mapa visual de "objetos cercanos a mí" (en vez de la distancia numérica en la tarjeta) queda marcado como mejora futura.
+
+---
+
 ## 8. Pendiente / próximos pasos de negocio
 
 Estas son las piezas de la lógica de negocio original que **todavía no están resueltas** en el producto:
@@ -123,6 +133,8 @@ Estas son las piezas de la lógica de negocio original que **todavía no están 
 2. **Rol de administrador / moderación**: no existe un panel para gestionar usuarios, publicaciones reportadas o disputas.
 3. **Notificaciones**: no hay aviso (email, push) cuando se genera una propuesta de trueque, llega un mensaje nuevo, o alguien confirma/rechaza su parte — el usuario tiene que entrar a la app para enterarse.
 4. **Resolución de disputas**: si una parte confirma "recibí mi objeto" y otra no, o hay desacuerdo sobre el estado de un objeto entregado, no hay ningún mecanismo de mediación.
+5. **Matching por cercanía**: la ubicación ya se puede cargar y se muestra la distancia en el feed (sección 7.1), pero el algoritmo de matching todavía no la usa como criterio para armar los ciclos de trueque.
+6. **Mapa de objetos cercanos**: vista tipo mapa con los objetos disponibles geolocalizados alrededor del usuario — marcado como mejora futura por el cliente.
 5. **Cancelación unilateral**: hoy cualquier participante puede cancelar solo, sin necesidad de acuerdo de las demás partes (ver sección 5.2) — vale la pena revisar si esto es lo deseado a medida que crezca el uso real.
 
 ---

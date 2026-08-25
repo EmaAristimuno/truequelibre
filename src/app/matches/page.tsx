@@ -1,16 +1,11 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, MessageCircle } from "lucide-react";
+import { MessageCircle, Repeat } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getMyMatches } from "@/lib/queries/matches";
 import { MatchActions } from "@/components/match-actions";
-
-const STATUS_LABEL: Record<string, string> = {
-  proposed: "Propuesto",
-  accepted: "Aceptado",
-  completed: "Completado",
-  cancelled: "Cancelado",
-};
+import { MatchLegList } from "@/components/match-leg-list";
+import { MatchStatusBadge } from "@/components/match-status-badge";
 
 export default async function MatchesPage({
   searchParams,
@@ -39,10 +34,22 @@ export default async function MatchesPage({
       )}
 
       {matches.length === 0 && (
-        <p className="mt-8 text-sm text-stone-500">
-          Todavía no tenés trueques propuestos. Publicá un objeto para que el
-          algoritmo busque matches, incluso en cadena con otras personas.
-        </p>
+        <div className="mt-10 flex flex-col items-center gap-3 rounded-2xl border border-dashed border-stone-300 py-14 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
+            <Repeat className="h-7 w-7" />
+          </span>
+          <p className="max-w-xs text-sm text-stone-500">
+            Todavía no tenés trueques propuestos. Publicá un objeto para que
+            el algoritmo busque matches, incluso en cadena con otras
+            personas.
+          </p>
+          <Link
+            href="/publicar"
+            className="mt-1 rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-600"
+          >
+            Publicar mi objeto
+          </Link>
+        </div>
       )}
 
       <div className="mt-6 flex flex-col gap-4">
@@ -52,35 +59,18 @@ export default async function MatchesPage({
             className="rounded-2xl border border-stone-200 bg-white p-5"
           >
             <div className="mb-3 flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+              <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                <Repeat className="h-3.5 w-3.5" />
                 {match.legs.length === 2
                   ? "Trueque bilateral"
                   : `Cadena de ${match.legs.length}`}
               </span>
-              <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-600">
-                {STATUS_LABEL[match.status] ?? match.status}
-              </span>
+              <MatchStatusBadge status={match.status} />
             </div>
 
-            <div className="flex flex-col gap-2">
-              {match.legs.map((leg) => (
-                <div
-                  key={leg.itemId}
-                  className="flex items-center gap-2 text-sm text-stone-700"
-                >
-                  <span className="font-medium">{leg.giverName}</span>
-                  <ArrowRight className="h-4 w-4 text-amber-500" />
-                  <span className="font-medium">{leg.receiverName}</span>
-                  <span className="text-stone-400">·</span>
-                  <span>{leg.itemTitle}</span>
-                  {leg.giverReceived && leg.receiverReceived && (
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                  )}
-                </div>
-              ))}
-            </div>
+            <MatchLegList legs={match.legs} />
 
-            <div className="mt-4 flex items-center gap-3">
+            <div className="mt-4 flex items-center gap-4">
               <MatchActions match={match} userId={user.id} />
               <Link
                 href={`/matches/${match.id}`}

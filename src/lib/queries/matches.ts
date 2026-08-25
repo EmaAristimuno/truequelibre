@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { CATEGORY_EMOJI } from "@/lib/categories";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -6,6 +7,8 @@ export interface MatchLegView {
   itemId: string;
   itemTitle: string;
   itemCategory: string;
+  itemEmoji: string;
+  itemImageUrl?: string;
   giverId: string;
   giverName: string;
   receiverId: string;
@@ -41,7 +44,7 @@ async function enrichLegs(
 
   const { data: items } = await supabase
     .from("items")
-    .select("id, title, category")
+    .select("id, title, category, images")
     .in("id", itemIds);
   const { data: profiles } = await supabase
     .from("profiles")
@@ -55,6 +58,8 @@ async function enrichLegs(
     itemId: leg.item_id,
     itemTitle: itemById.get(leg.item_id)?.title ?? "Objeto",
     itemCategory: itemById.get(leg.item_id)?.category ?? "",
+    itemEmoji: CATEGORY_EMOJI[itemById.get(leg.item_id)?.category ?? ""] ?? "📦",
+    itemImageUrl: itemById.get(leg.item_id)?.images?.[0],
     giverId: leg.giver_id,
     giverName: nameById.get(leg.giver_id) ?? "Usuario",
     receiverId: leg.receiver_id,

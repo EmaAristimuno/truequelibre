@@ -5,6 +5,7 @@ import { User } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getMyItems } from "@/lib/queries/my-items";
 import { CONDITION_LABEL, STATUS_LABEL } from "@/lib/types";
+import { LocationPickerLoader } from "@/components/location-picker-loader";
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   available: "bg-emerald-50 text-emerald-700",
@@ -24,7 +25,7 @@ export default async function PerfilPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("username, location, rating, rating_count, created_at")
+    .select("username, location, latitude, longitude, rating, rating_count, created_at")
     .eq("id", user.id)
     .single();
 
@@ -58,6 +59,14 @@ export default async function PerfilPage() {
         <Link href="/matches" className="font-medium text-emerald-700">
           Ver mis trueques →
         </Link>
+      </div>
+
+      <div className="mt-6">
+        <LocationPickerLoader
+          initialLocation={profile?.location ?? null}
+          initialLat={profile?.latitude ?? null}
+          initialLng={profile?.longitude ?? null}
+        />
       </div>
 
       <h2 className="mt-8 text-base font-semibold text-stone-900">
