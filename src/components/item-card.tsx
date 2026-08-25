@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { MapPin, Star, ArrowLeftRight, Navigation, Sparkles } from "lucide-react";
 import { CONDITION_LABEL, type Item } from "@/lib/types";
 import { formatDistanceKm } from "@/lib/distance";
@@ -6,7 +7,10 @@ import { formatDistanceKm } from "@/lib/distance";
 export function ItemCard({ item }: { item: Item }) {
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition-shadow hover:shadow-md">
-      <div className="relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-100 to-amber-100 text-6xl">
+      <Link
+        href={`/items/${item.id}`}
+        className="relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-100 to-amber-100 text-6xl"
+      >
         {item.imageUrl ? (
           <Image
             src={item.imageUrl}
@@ -35,7 +39,7 @@ export function ItemCard({ item }: { item: Item }) {
             </span>
           )}
         </div>
-      </div>
+      </Link>
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div>
@@ -43,7 +47,9 @@ export function ItemCard({ item }: { item: Item }) {
             Ofrece · {item.category}
           </span>
           <h3 className="mt-0.5 text-base font-semibold text-stone-900">
-            {item.title}
+            <Link href={`/items/${item.id}`} className="hover:underline">
+              {item.title}
+            </Link>
           </h3>
         </div>
 
@@ -81,9 +87,12 @@ export function ItemCard({ item }: { item: Item }) {
           </span>
         </div>
 
-        <button className="mt-1 w-full rounded-xl bg-emerald-700 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800">
+        <Link
+          href={`/items/${item.id}`}
+          className="mt-1 block w-full rounded-xl bg-emerald-700 py-2 text-center text-sm font-semibold text-white transition-colors hover:bg-emerald-800"
+        >
           Proponer trueque
-        </button>
+        </Link>
       </div>
     </article>
   );

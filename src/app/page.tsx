@@ -1,6 +1,5 @@
 import { FeedSection } from "@/components/feed-section";
 import { HowItWorks } from "@/components/how-it-works";
-import { MOCK_ITEMS } from "@/lib/mock-items";
 import { getAvailableItems } from "@/lib/queries/items";
 
 export default async function Home({
@@ -9,8 +8,7 @@ export default async function Home({
   searchParams: Promise<{ published?: string }>;
 }) {
   const params = await searchParams;
-  const realItems = await getAvailableItems();
-  const items = [...realItems, ...MOCK_ITEMS];
+  const items = await getAvailableItems();
 
   return (
     <>

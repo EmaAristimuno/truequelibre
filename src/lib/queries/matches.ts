@@ -26,6 +26,20 @@ export interface MatchView {
   legs: MatchLegView[];
 }
 
+// Una propuesta manual (initiated_by no nulo) todavía no reserva los items:
+// mientras el dueño no elige una, no es "un trueque real" y no debe
+// aparecer en /matches (ver selectProposal en actions/matches.ts).
+async function isUnselectedProposal(
+  supabase: SupabaseServerClient,
+  match: { status: string; initiated_by: string | null },
+  itemIds: string[],
+): Promise<boolean> {
+  if (!match.initiated_by || match.status !== "proposed") return false;
+
+  const { data: items } = await supabase.from("items").select("status").in("id", itemIds);
+  return (items ?? []).some((item) => item.status === "available");
+}
+
 async function enrichLegs(
   supabase: SupabaseServerClient,
   legs: {
@@ -90,7 +104,7 @@ export async function getMyMatches(userId: string): Promise<MatchView[]> {
 
   const { data: matches } = await supabase
     .from("matches")
-    .select("id, status")
+    .select("id, status, initiated_by")
     .in("id", matchIds)
     .order("created_at", { ascending: false });
 
@@ -101,15 +115,28 @@ export async function getMyMatches(userId: string): Promise<MatchView[]> {
 
   if (!matches || !allLegs) return [];
 
-  return Promise.all(
-    matches.map(async (match) => ({
-      id: match.id,
-      status: match.status,
-      legs: await enrichLegs(
+  const visible = await Promise.all(
+    matches.map(async (match) => {
+      const legs = allLegs.filter((leg) => leg.match_id === match.id);
+      const unselected = await isUnselectedProposal(
         supabase,
-        allLegs.filter((leg) => leg.match_id === match.id),
-      ),
-    })),
+        match,
+        legs.map((leg) => leg.item_id),
+      );
+      return unselected ? null : { match, legs };
+    }),
+  );
+
+  return Promise.all(
+    visible
+      .filter((entry): entry is { match: (typeof matches)[number]; legs: typeof allLegs } =>
+        entry !== null,
+      )
+      .map(async ({ match, legs }) => ({
+        id: match.id,
+        status: match.status,
+        legs: await enrichLegs(supabase, legs),
+      })),
   );
 }
 
@@ -118,7 +145,7 @@ export async function getMatchById(matchId: string): Promise<MatchView | null> {
 
   const { data: match } = await supabase
     .from("matches")
-    .select("id, status")
+    .select("id, status, initiated_by")
     .eq("id", matchId)
     .maybeSingle();
 
@@ -130,6 +157,10 @@ export async function getMatchById(matchId: string): Promise<MatchView | null> {
     .eq("match_id", matchId);
 
   if (!legs || legs.length === 0) return null;
+
+  if (await isUnselectedProposal(supabase, match, legs.map((leg) => leg.item_id))) {
+    return null;
+  }
 
   return {
     id: match.id,

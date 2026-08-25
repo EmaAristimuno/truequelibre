@@ -5,8 +5,21 @@ import { User, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getMyItems } from "@/lib/queries/my-items";
 import { getMyPayments } from "@/lib/queries/payments";
+import { getMySentProposals } from "@/lib/queries/proposals";
 import { CONDITION_LABEL, STATUS_LABEL } from "@/lib/types";
 import { LocationPickerLoader } from "@/components/location-picker-loader";
+
+const PROPOSAL_STATUS_LABEL: Record<string, string> = {
+  pending: "Pendiente",
+  selected: "Aceptada",
+  rejected: "Rechazada",
+};
+
+const PROPOSAL_STATUS_BADGE_CLASS: Record<string, string> = {
+  pending: "bg-amber-50 text-amber-700",
+  selected: "bg-emerald-50 text-emerald-700",
+  rejected: "bg-red-50 text-red-600",
+};
 
 const PAYMENT_STATUS_LABEL: Record<string, string> = {
   completed: "Completado",
@@ -51,6 +64,7 @@ export default async function PerfilPage({
 
   const items = await getMyItems(user.id);
   const payments = await getMyPayments(user.id);
+  const sentProposals = await getMySentProposals(user.id);
 
   return (
     <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
@@ -142,6 +156,61 @@ export default async function PerfilPage({
           </Link>
         ))}
       </div>
+
+      <h2 className="mt-8 text-base font-semibold text-stone-900">Propuestas que envié</h2>
+
+      {sentProposals.length === 0 && (
+        <p className="mt-3 text-sm text-stone-500">
+          Todavía no propusiste ningún trueque manual.
+        </p>
+      )}
+
+      {sentProposals.length > 0 && (
+        <div className="mt-4 flex flex-col gap-2">
+          {sentProposals.map((proposal) => {
+            const content = (
+              <>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-stone-900">
+                    {proposal.targetItemTitle}
+                  </p>
+                  <p className="text-xs text-stone-500">
+                    {new Date(proposal.createdAt).toLocaleDateString("es-AR", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
+                <span
+                  className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
+                    PROPOSAL_STATUS_BADGE_CLASS[proposal.status]
+                  }`}
+                >
+                  {PROPOSAL_STATUS_LABEL[proposal.status]}
+                </span>
+              </>
+            );
+
+            return proposal.status === "selected" ? (
+              <Link
+                key={proposal.matchId}
+                href={`/matches/${proposal.matchId}`}
+                className="flex items-center justify-between gap-4 rounded-2xl border border-stone-200 bg-white p-4 transition-colors hover:border-emerald-300"
+              >
+                {content}
+              </Link>
+            ) : (
+              <div
+                key={proposal.matchId}
+                className="flex items-center justify-between gap-4 rounded-2xl border border-stone-200 bg-white p-4"
+              >
+                {content}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <h2 className="mt-8 text-base font-semibold text-stone-900">Mis pagos</h2>
 

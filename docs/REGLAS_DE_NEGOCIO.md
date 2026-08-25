@@ -68,6 +68,17 @@ Es el corazón del producto. Funciona así, en términos simples:
 
 **Importante:** el algoritmo solo *propone*. No cierra el trueque por sí solo — eso requiere que todas las partes lo acepten (sección 5).
 
+### 4.1 Propuestas manuales
+
+Además del algoritmo automático, cualquier usuario puede entrar al detalle de un objeto disponible de otra persona y **proponerle un trueque manualmente**, eligiendo cuál de sus propios objetos disponibles ofrece a cambio.
+
+La diferencia clave con el matching automático: **una propuesta manual no reserva los objetos de entrada**. El objeto pedido sigue apareciendo como Disponible para que, si varias personas lo quieren, todas puedan proponer. El dueño del objeto ve todas las propuestas que le llegaron (con qué le ofrece cada uno) y elige una:
+
+- Al **aceptar** una propuesta, recién ahí ambos objetos pasan a estado **En trueque**, cualquier otra propuesta pendiente sobre esos mismos objetos queda automáticamente **Rechazada**, y el trueque sigue el mismo camino que uno automático (sección 5: cada parte debe confirmar para que quede Aceptado).
+- Al **rechazar** una propuesta puntual, esa propuesta queda cerrada y el objeto sigue disponible para otras.
+
+Quien propone puede seguir el estado de sus propuestas enviadas (Pendiente / Aceptada / Rechazada) desde su perfil.
+
 ---
 
 ## 5. Aceptar un trueque propuesto

@@ -13,10 +13,13 @@ import { RatingForm } from "@/components/rating-form";
 
 export default async function MatchDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ selected?: string }>;
 }) {
   const { id } = await params;
+  const { selected } = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
   const user = data.user;
@@ -60,6 +63,12 @@ export default async function MatchDetailPage({
         <ArrowLeft className="h-4 w-4" />
         Mis trueques
       </Link>
+
+      {selected && (
+        <p className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+          ¡Aceptaste la propuesta! Confirmá el trueque para avanzar.
+        </p>
+      )}
 
       <div className="mt-4 rounded-2xl border border-stone-200 bg-white p-5">
         <div className="mb-3 flex items-center justify-between">
