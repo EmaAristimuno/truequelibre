@@ -1,11 +1,24 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { User } from "lucide-react";
+import { User, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getMyItems } from "@/lib/queries/my-items";
+import { getMyPayments } from "@/lib/queries/payments";
 import { CONDITION_LABEL, STATUS_LABEL } from "@/lib/types";
 import { LocationPickerLoader } from "@/components/location-picker-loader";
+
+const PAYMENT_STATUS_LABEL: Record<string, string> = {
+  completed: "Completado",
+  created: "Pendiente",
+  failed: "Fallido",
+};
+
+const PAYMENT_STATUS_BADGE_CLASS: Record<string, string> = {
+  completed: "bg-emerald-50 text-emerald-700",
+  created: "bg-amber-50 text-amber-700",
+  failed: "bg-red-50 text-red-600",
+};
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   available: "bg-emerald-50 text-emerald-700",
@@ -37,6 +50,7 @@ export default async function PerfilPage({
     .single();
 
   const items = await getMyItems(user.id);
+  const payments = await getMyPayments(user.id);
 
   return (
     <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
@@ -108,7 +122,10 @@ export default async function PerfilPage({
               )}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-stone-900">
+              <p className="flex items-center gap-1.5 truncate text-sm font-semibold text-stone-900">
+                {item.featured && (
+                  <Sparkles className="h-3.5 w-3.5 shrink-0 text-amber-500" />
+                )}
                 {item.title}
               </p>
               <p className="text-xs text-stone-500">
@@ -125,6 +142,46 @@ export default async function PerfilPage({
           </Link>
         ))}
       </div>
+
+      <h2 className="mt-8 text-base font-semibold text-stone-900">Mis pagos</h2>
+
+      {payments.length === 0 && (
+        <p className="mt-3 text-sm text-stone-500">
+          Todavía no destacaste ninguna publicación.
+        </p>
+      )}
+
+      {payments.length > 0 && (
+        <div className="mt-4 flex flex-col gap-2">
+          {payments.map((payment) => (
+            <div
+              key={payment.id}
+              className="flex items-center justify-between gap-4 rounded-2xl border border-stone-200 bg-white p-4"
+            >
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-stone-900">
+                  {payment.itemTitle}
+                </p>
+                <p className="text-xs text-stone-500">
+                  {new Date(payment.createdAt).toLocaleDateString("es-AR", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}{" "}
+                  · {payment.currency} {payment.amount.toFixed(2)}
+                </p>
+              </div>
+              <span
+                className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
+                  PAYMENT_STATUS_BADGE_CLASS[payment.status] ?? "bg-stone-100 text-stone-600"
+                }`}
+              >
+                {PAYMENT_STATUS_LABEL[payment.status] ?? payment.status}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

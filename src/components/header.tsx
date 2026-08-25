@@ -9,13 +9,15 @@ export async function Header() {
   const user = data.user;
 
   let username: string | null = null;
+  let isAdmin = false;
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("username")
+      .select("username, is_admin")
       .eq("id", user.id)
       .single();
     username = profile?.username ?? null;
+    isAdmin = profile?.is_admin === true;
   }
 
   return (
@@ -55,6 +57,14 @@ export async function Header() {
               >
                 Mis trueques
               </Link>
+              {isAdmin && (
+                <Link
+                  href="/admin/finanzas"
+                  className="hidden text-sm font-medium text-stone-600 hover:text-stone-900 sm:inline"
+                >
+                  Admin
+                </Link>
+              )}
               <form action={logout}>
                 <button className="text-sm font-medium text-stone-600 hover:text-stone-900">
                   Salir

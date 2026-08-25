@@ -6,13 +6,28 @@ import type { Item, ItemCondition } from "@/lib/types";
 export async function getAvailableItems(): Promise<Item[]> {
   const supabase = await createClient();
 
-  const { data: items } = await supabase
+  const { data: rawItems } = await supabase
     .from("items")
-    .select("id, title, category, condition, looking_for_categories, owner_id, images")
+    .select(
+      "id, title, category, condition, looking_for_categories, owner_id, images, featured_until",
+    )
     .eq("status", "available")
     .order("created_at", { ascending: false });
 
-  if (!items || items.length === 0) return [];
+  if (!rawItems || rawItems.length === 0) return [];
+
+  const now = Date.now();
+  const isFeatured = (item: (typeof rawItems)[number]) =>
+    item.featured_until !== null && new Date(item.featured_until).getTime() > now;
+
+  // Los destacados van primero; el resto conserva el orden por fecha de
+  // creación (Array.prototype.sort es estable, así que devolver 0 alcanza).
+  const items = [...rawItems].sort((a, b) => {
+    const aFeatured = isFeatured(a);
+    const bFeatured = isFeatured(b);
+    if (aFeatured === bFeatured) return 0;
+    return aFeatured ? -1 : 1;
+  });
 
   const ownerIds = [...new Set(items.map((item) => item.owner_id))];
   const { data: profiles } = await supabase
@@ -55,6 +70,7 @@ export async function getAvailableItems(): Promise<Item[]> {
       ownerRating: profile?.rating ?? 0,
       distanceKm:
         viewerCoords && ownerCoords ? haversineKm(viewerCoords, ownerCoords) : undefined,
+      featured: isFeatured(item),
     };
   });
 }

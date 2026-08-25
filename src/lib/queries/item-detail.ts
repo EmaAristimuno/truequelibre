@@ -12,6 +12,7 @@ export interface ItemDetail {
   lookingForCategories: string[];
   lookingForDescription: string;
   status: ItemStatus;
+  featuredUntil: string | null;
 }
 
 export async function getItemDetail(id: string): Promise<ItemDetail | null> {
@@ -20,7 +21,7 @@ export async function getItemDetail(id: string): Promise<ItemDetail | null> {
   const { data } = await supabase
     .from("items")
     .select(
-      "id, owner_id, title, description, category, condition, images, looking_for_categories, looking_for_description, status",
+      "id, owner_id, title, description, category, condition, images, looking_for_categories, looking_for_description, status, featured_until",
     )
     .eq("id", id)
     .single();
@@ -38,5 +39,6 @@ export async function getItemDetail(id: string): Promise<ItemDetail | null> {
     lookingForCategories: data.looking_for_categories ?? [],
     lookingForDescription: data.looking_for_description ?? "",
     status: data.status as ItemStatus,
+    featuredUntil: data.featured_until,
   };
 }

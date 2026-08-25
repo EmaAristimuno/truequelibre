@@ -28,4 +28,5 @@ export interface Item {
   ownerLocation: string;
   ownerRating: number;
   distanceKm?: number;
+  featured?: boolean;
 }

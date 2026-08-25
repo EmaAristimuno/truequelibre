@@ -12,6 +12,7 @@ export interface MyItem {
   status: ItemStatus;
   lookingFor: string[];
   createdAt: string;
+  featured: boolean;
 }
 
 export async function getMyItems(userId: string): Promise<MyItem[]> {
@@ -20,10 +21,12 @@ export async function getMyItems(userId: string): Promise<MyItem[]> {
   const { data } = await supabase
     .from("items")
     .select(
-      "id, title, category, condition, status, looking_for_categories, created_at, images",
+      "id, title, category, condition, status, looking_for_categories, created_at, images, featured_until",
     )
     .eq("owner_id", userId)
     .order("created_at", { ascending: false });
+
+  const now = Date.now();
 
   return (data ?? []).map((item) => ({
     id: item.id,
@@ -35,5 +38,6 @@ export async function getMyItems(userId: string): Promise<MyItem[]> {
     status: item.status as ItemStatus,
     lookingFor: item.looking_for_categories,
     createdAt: item.created_at,
+    featured: item.featured_until !== null && new Date(item.featured_until).getTime() > now,
   }));
 }
