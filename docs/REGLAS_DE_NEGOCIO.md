@@ -84,7 +84,16 @@ Una vez que un trueque está **Aceptado**, las partes coordinan por el chat inte
 - Cada usuario presiona **"Confirmar que recibí mi objeto"**.
 - Cuando **todas** las partes de la cadena confirmaron haber recibido lo suyo, el trueque pasa a estado **Completado**, y los objetos involucrados también quedan marcados como **Completado** (dejan de estar "En trueque").
 
-**Pendiente de definir/construir:** todavía no existe una forma de **cancelar o rechazar** una propuesta desde la interfaz — si alguien no confirma nunca (ni la aceptación ni la entrega), el trueque queda indefinidamente en ese estado y el objeto sigue reservado. Tampoco hay un mecanismo de disputa si una parte dice haber entregado y la otra lo niega.
+### 5.2 Rechazar / cancelar una propuesta
+
+Cualquier participante puede presionar **"Rechazar"** en cualquier momento mientras el trueque está en estado Propuesto o Aceptado (no una vez Completado). Al rechazar:
+
+- El trueque pasa a estado **Cancelado**.
+- **Todos** los objetos involucrados (de todas las partes, no solo de quien rechaza) vuelven a estado **Disponible** y quedan de nuevo abiertos a un nuevo match.
+
+No hace falta que todas las partes estén de acuerdo para cancelar: **alcanza con que una sola persona rechace** para deshacer el trueque completo. Esto es una decisión de producto a revisar — hoy prioriza que nadie quede "atrapado" en un trueque que no quiere, pero significa que cualquiera puede deshacer el acuerdo unilateralmente incluso después de que otros ya aceptaron.
+
+**Pendiente de definir/construir:** no hay mecanismo de disputa si una parte confirma "recibí mi objeto" (estado Aceptado → intento de Completado) y otra parte lo niega o no responde.
 
 ---
 
@@ -99,8 +108,10 @@ Una vez que un trueque está **Aceptado**, las partes coordinan por el chat inte
 
 ## 7. Reputación y calificaciones
 
-- El esquema de datos ya contempla una calificación (0 a 5 estrellas) y contador de calificaciones por usuario.
-- **Todavía no está implementado el flujo para calificar** a la otra parte después de un trueque. Hoy todos los usuarios muestran 0.0 ★.
+- Cuando un trueque queda **Completado**, cada participante puede calificar (1 a 5 estrellas + comentario opcional) a cada una de las otras partes de esa cadena.
+- Una vez enviada una calificación, no se puede modificar ni repetir para ese mismo trueque.
+- El perfil de cada usuario muestra el **promedio** de todas sus calificaciones recibidas y la cantidad total.
+- Las calificaciones son públicas (visibles en el perfil), pero solo quien participó del trueque puede calificar.
 
 ---
 
@@ -108,12 +119,11 @@ Una vez que un trueque está **Aceptado**, las partes coordinan por el chat inte
 
 Estas son las piezas de la lógica de negocio original que **todavía no están resueltas** en el producto:
 
-1. **Cancelación / rechazo de una propuesta**: hoy no existe manera de rechazar un match propuesto; el objeto queda reservado indefinidamente si nadie avanza.
-2. **Calificación post-trueque**: UI para que cada parte califique a las demás una vez completado (el campo ya existe en la base, falta la pantalla).
-3. **Monetización**: sin definir todavía a nivel de producto. Se discutieron ideas (destacar publicaciones, compensación en efectivo sobre trueques desiguales, servicios de verificación/seguro) pero no hay nada construido.
-4. **Rol de administrador / moderación**: no existe un panel para gestionar usuarios, publicaciones reportadas o disputas.
-5. **Notificaciones**: no hay aviso (email, push) cuando se genera una propuesta de trueque, llega un mensaje nuevo, o alguien confirma su parte — el usuario tiene que entrar a la app para enterarse.
-6. **Resolución de disputas**: si una parte confirma "recibí mi objeto" y otra no, o hay desacuerdo sobre el estado de un objeto entregado, no hay ningún mecanismo de mediación.
+1. **Monetización**: sin definir todavía a nivel de producto. Se discutieron ideas (destacar publicaciones, compensación en efectivo sobre trueques desiguales, servicios de verificación/seguro) pero no hay nada construido.
+2. **Rol de administrador / moderación**: no existe un panel para gestionar usuarios, publicaciones reportadas o disputas.
+3. **Notificaciones**: no hay aviso (email, push) cuando se genera una propuesta de trueque, llega un mensaje nuevo, o alguien confirma/rechaza su parte — el usuario tiene que entrar a la app para enterarse.
+4. **Resolución de disputas**: si una parte confirma "recibí mi objeto" y otra no, o hay desacuerdo sobre el estado de un objeto entregado, no hay ningún mecanismo de mediación.
+5. **Cancelación unilateral**: hoy cualquier participante puede cancelar solo, sin necesidad de acuerdo de las demás partes (ver sección 5.2) — vale la pena revisar si esto es lo deseado a medida que crezca el uso real.
 
 ---
 
