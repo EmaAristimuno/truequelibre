@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { notifyMatchAccepted, notifyMatchCompleted } from "@/lib/email/notify";
 
 export async function acceptMatch(formData: FormData) {
   const matchId = String(formData.get("match_id") ?? "");
@@ -29,15 +30,17 @@ export async function acceptMatch(formData: FormData) {
 
   const { data: legs } = await supabase
     .from("match_legs")
-    .select("giver_confirmed, receiver_confirmed")
+    .select("giver_id, giver_confirmed, receiver_confirmed")
     .eq("match_id", matchId);
 
   const allConfirmed = legs?.every(
     (leg) => leg.giver_confirmed && leg.receiver_confirmed,
   );
 
-  if (allConfirmed) {
+  if (legs && allConfirmed) {
     await supabase.from("matches").update({ status: "accepted" }).eq("id", matchId);
+    const participantIds = [...new Set(legs.map((leg) => leg.giver_id))];
+    await notifyMatchAccepted(matchId, participantIds);
   }
 
   revalidatePath("/matches");
@@ -68,7 +71,7 @@ export async function confirmDelivery(formData: FormData) {
 
   const { data: legs } = await supabase
     .from("match_legs")
-    .select("item_id, giver_received, receiver_received")
+    .select("item_id, giver_id, giver_received, receiver_received")
     .eq("match_id", matchId);
 
   const allReceived = legs?.every(
@@ -88,6 +91,9 @@ export async function confirmDelivery(formData: FormData) {
         "id",
         legs.map((leg) => leg.item_id),
       );
+
+    const participantIds = [...new Set(legs.map((leg) => leg.giver_id))];
+    await notifyMatchCompleted(matchId, participantIds);
   }
 
   revalidatePath("/matches");

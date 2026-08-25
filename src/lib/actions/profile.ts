@@ -4,7 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export async function updateLocation(formData: FormData) {
+export type UpdateLocationState = { success: boolean; error?: string } | null;
+
+export async function updateLocation(
+  _prevState: UpdateLocationState,
+  formData: FormData,
+): Promise<UpdateLocationState> {
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
 
@@ -21,7 +26,7 @@ export async function updateLocation(formData: FormData) {
   const longitude = longitudeRaw === "" ? null : Number(longitudeRaw);
   const maxDistanceKm = maxDistanceRaw === "" ? null : Number(maxDistanceRaw);
 
-  await supabase
+  const { error } = await supabase
     .from("profiles")
     .update({
       location: location || null,
@@ -32,5 +37,10 @@ export async function updateLocation(formData: FormData) {
     })
     .eq("id", userData.user.id);
 
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
   revalidatePath("/perfil");
+  return { success: true };
 }

@@ -107,6 +107,15 @@ No hace falta que todas las partes estén de acuerdo para cancelar: **alcanza co
 
 ---
 
+## 6.1 Notificaciones por email
+
+- El usuario recibe un email automático en tres momentos: cuando el algoritmo le propone un trueque nuevo, cuando todas las partes lo aceptan, y cuando el trueque se completa (con recordatorio de calificar).
+- Los emails son transaccionales (vía Resend), no hay todavía newsletter ni comunicaciones de marketing.
+- **No hay email por cada mensaje de chat nuevo** — fue una decisión deliberada para evitar spam en conversaciones activas; si en el futuro se agrega, debería ser con lógica de "solo si la otra parte no vio el chat en X tiempo", no por cada mensaje.
+- Todavía no hay forma de desactivar estas notificaciones desde la cuenta (sin preferencias de usuario).
+
+---
+
 ## 7. Reputación y calificaciones
 
 - Cuando un trueque queda **Completado**, cada participante puede calificar (1 a 5 estrellas + comentario opcional) a cada una de las otras partes de esa cadena.
@@ -133,10 +142,10 @@ Estas son las piezas de la lógica de negocio original que **todavía no están 
 
 1. **Monetización**: sin definir todavía a nivel de producto. Se discutieron ideas (destacar publicaciones, compensación en efectivo sobre trueques desiguales, servicios de verificación/seguro) pero no hay nada construido.
 2. **Rol de administrador / moderación**: no existe un panel para gestionar usuarios, publicaciones reportadas o disputas.
-3. **Notificaciones**: no hay aviso (email, push) cuando se genera una propuesta de trueque, llega un mensaje nuevo, o alguien confirma/rechaza su parte — el usuario tiene que entrar a la app para enterarse.
-4. **Resolución de disputas**: si una parte confirma "recibí mi objeto" y otra no, o hay desacuerdo sobre el estado de un objeto entregado, no hay ningún mecanismo de mediación.
-5. **Mapa de objetos cercanos**: vista tipo mapa con los objetos disponibles geolocalizados alrededor del usuario — marcado como mejora futura por el cliente (la cercanía como criterio de matching en sí ya está resuelta, ver sección 7.1).
-6. **Cancelación unilateral**: hoy cualquier participante puede cancelar solo, sin necesidad de acuerdo de las demás partes (ver sección 5.2) — vale la pena revisar si esto es lo deseado a medida que crezca el uso real.
+3. **Resolución de disputas**: si una parte confirma "recibí mi objeto" y otra no, o hay desacuerdo sobre el estado de un objeto entregado, no hay ningún mecanismo de mediación.
+4. **Mapa de objetos cercanos**: vista tipo mapa con los objetos disponibles geolocalizados alrededor del usuario — marcado como mejora futura por el cliente (la cercanía como criterio de matching en sí ya está resuelta, ver sección 7.1).
+5. **Cancelación unilateral**: hoy cualquier participante puede cancelar solo, sin necesidad de acuerdo de las demás partes (ver sección 5.2) — vale la pena revisar si esto es lo deseado a medida que crezca el uso real.
+6. **Notificaciones parciales**: hoy solo se avisa por email en propuesta/aceptación/completado (ver sección 6.1). Todavía no hay push notifications ni avisos por mensaje de chat nuevo, ni forma de desactivar los emails.
 
 ---
 

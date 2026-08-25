@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
 import { LocateFixed, Search } from "lucide-react";
+import { toast } from "sonner";
 import "leaflet/dist/leaflet.css";
 import { updateLocation } from "@/lib/actions/profile";
 
@@ -83,6 +84,16 @@ export function LocationPicker({
   const [maxDistanceKm, setMaxDistanceKm] = useState(
     initialMaxDistanceKm !== null ? String(initialMaxDistanceKm) : "",
   );
+  const [state, formAction, pending] = useActionState(updateLocation, null);
+
+  useEffect(() => {
+    if (!state) return;
+    if (state.success) {
+      toast.success("Ubicación guardada");
+    } else {
+      toast.error(state.error ?? "No se pudo guardar la ubicación");
+    }
+  }, [state]);
 
   async function reverseGeocode(lat: number, lng: number) {
     setLoading("reverse");
@@ -199,7 +210,7 @@ export function LocationPicker({
         </MapContainer>
       </div>
 
-      <form action={updateLocation} className="flex flex-col gap-2">
+      <form action={formAction} className="flex flex-col gap-2">
         <input type="hidden" name="latitude" value={hasPin ? position[0] : ""} />
         <input type="hidden" name="longitude" value={hasPin ? position[1] : ""} />
         <input
@@ -236,9 +247,10 @@ export function LocationPicker({
 
         <button
           type="submit"
-          className="self-start rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800"
+          disabled={pending}
+          className="self-start rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 disabled:opacity-50"
         >
-          Guardar ubicación
+          {pending ? "Guardando..." : "Guardar ubicación"}
         </button>
       </form>
     </div>

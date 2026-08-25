@@ -1,6 +1,7 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { findTradeCycles, type MatchableItem } from "@/lib/matching/find-cycles";
+import { notifyMatchProposed } from "@/lib/email/notify";
 
 /**
  * Corre el algoritmo contra todos los items disponibles y persiste cada
@@ -93,6 +94,9 @@ export async function runMatching(): Promise<{ createdMatches: number }> {
 
     legs.forEach((leg) => reservedItemIds.add(leg.itemId));
     createdMatches += 1;
+
+    const participantIds = [...new Set(legs.map((leg) => leg.giverId))];
+    await notifyMatchProposed(match.id, participantIds, legs.length > 2);
   }
 
   return { createdMatches };
