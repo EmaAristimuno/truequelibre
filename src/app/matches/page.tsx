@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, CheckCircle2, MessageCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getMyMatches } from "@/lib/queries/matches";
 import { acceptMatch } from "@/lib/actions/matches";
@@ -86,19 +87,28 @@ export default async function MatchesPage({
                 ))}
               </div>
 
-              {match.status === "proposed" && !iAlreadyConfirmed && (
-                <form action={acceptMatch} className="mt-4">
-                  <input type="hidden" name="match_id" value={match.id} />
-                  <button className="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800">
-                    Aceptar trueque
-                  </button>
-                </form>
-              )}
-              {iAlreadyConfirmed && match.status === "proposed" && (
-                <p className="mt-4 text-sm text-stone-500">
-                  Ya confirmaste. Esperando al resto de las partes.
-                </p>
-              )}
+              <div className="mt-4 flex items-center gap-3">
+                {match.status === "proposed" && !iAlreadyConfirmed && (
+                  <form action={acceptMatch}>
+                    <input type="hidden" name="match_id" value={match.id} />
+                    <button className="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800">
+                      Aceptar trueque
+                    </button>
+                  </form>
+                )}
+                {iAlreadyConfirmed && match.status === "proposed" && (
+                  <p className="text-sm text-stone-500">
+                    Ya confirmaste. Esperando al resto de las partes.
+                  </p>
+                )}
+                <Link
+                  href={`/matches/${match.id}`}
+                  className="flex items-center gap-1.5 text-sm font-medium text-emerald-700 hover:text-emerald-800"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  Abrir chat
+                </Link>
+              </div>
             </div>
           );
         })}
