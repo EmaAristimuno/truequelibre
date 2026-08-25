@@ -15,8 +15,11 @@ export async function updateLocation(formData: FormData) {
   const location = String(formData.get("location") ?? "").trim();
   const latitudeRaw = String(formData.get("latitude") ?? "").trim();
   const longitudeRaw = String(formData.get("longitude") ?? "").trim();
+  const maxDistanceRaw = String(formData.get("max_distance_km") ?? "").trim();
+
   const latitude = latitudeRaw === "" ? null : Number(latitudeRaw);
   const longitude = longitudeRaw === "" ? null : Number(longitudeRaw);
+  const maxDistanceKm = maxDistanceRaw === "" ? null : Number(maxDistanceRaw);
 
   await supabase
     .from("profiles")
@@ -24,6 +27,8 @@ export async function updateLocation(formData: FormData) {
       location: location || null,
       latitude: latitude !== null && Number.isFinite(latitude) ? latitude : null,
       longitude: longitude !== null && Number.isFinite(longitude) ? longitude : null,
+      max_distance_km:
+        maxDistanceKm !== null && Number.isFinite(maxDistanceKm) ? maxDistanceKm : null,
     })
     .eq("id", userData.user.id);
 

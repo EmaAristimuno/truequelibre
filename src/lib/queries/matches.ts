@@ -17,6 +17,7 @@ export interface MatchLegView {
   receiverConfirmed: boolean;
   giverReceived: boolean;
   receiverReceived: boolean;
+  distanceKm?: number;
 }
 
 export interface MatchView {
@@ -35,6 +36,7 @@ async function enrichLegs(
     receiver_confirmed: boolean;
     giver_received: boolean;
     receiver_received: boolean;
+    distance_km: number | null;
   }[],
 ): Promise<MatchLegView[]> {
   const itemIds = [...new Set(legs.map((leg) => leg.item_id))];
@@ -68,11 +70,12 @@ async function enrichLegs(
     receiverConfirmed: leg.receiver_confirmed,
     giverReceived: leg.giver_received,
     receiverReceived: leg.receiver_received,
+    distanceKm: leg.distance_km ?? undefined,
   }));
 }
 
 const LEG_COLUMNS =
-  "item_id, giver_id, receiver_id, giver_confirmed, receiver_confirmed, giver_received, receiver_received";
+  "item_id, giver_id, receiver_id, giver_confirmed, receiver_confirmed, giver_received, receiver_received, distance_km";
 
 export async function getMyMatches(userId: string): Promise<MatchView[]> {
   const supabase = await createClient();

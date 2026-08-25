@@ -25,7 +25,9 @@ export default async function PerfilPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("username, location, latitude, longitude, rating, rating_count, created_at")
+    .select(
+      "username, location, latitude, longitude, max_distance_km, rating, rating_count, created_at",
+    )
     .eq("id", user.id)
     .single();
 
@@ -66,6 +68,7 @@ export default async function PerfilPage() {
           initialLocation={profile?.location ?? null}
           initialLat={profile?.latitude ?? null}
           initialLng={profile?.longitude ?? null}
+          initialMaxDistanceKm={profile?.max_distance_km ?? null}
         />
       </div>
 

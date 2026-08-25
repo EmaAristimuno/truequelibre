@@ -18,6 +18,7 @@ export function LocationPickerLoader(props: {
   initialLocation: string | null;
   initialLat: number | null;
   initialLng: number | null;
+  initialMaxDistanceKm: number | null;
 }) {
   return <LocationPicker {...props} />;
 }

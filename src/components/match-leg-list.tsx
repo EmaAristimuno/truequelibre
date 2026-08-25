@@ -1,6 +1,7 @@
 import Image from "next/image";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, Navigation } from "lucide-react";
 import type { MatchLegView } from "@/lib/queries/matches";
+import { formatDistanceKm } from "@/lib/distance";
 
 export function MatchLegList({ legs }: { legs: MatchLegView[] }) {
   return (
@@ -31,6 +32,12 @@ export function MatchLegList({ legs }: { legs: MatchLegView[] }) {
               <span className="font-medium text-stone-700">{leg.giverName}</span>
               <ArrowRight className="h-3 w-3 text-amber-500" />
               <span className="font-medium text-stone-700">{leg.receiverName}</span>
+              {leg.distanceKm !== undefined && (
+                <span className="flex items-center gap-0.5 text-stone-400">
+                  <Navigation className="h-3 w-3" />
+                  {formatDistanceKm(leg.distanceKm)}
+                </span>
+              )}
             </p>
           </div>
 

@@ -49,14 +49,25 @@ function ClickToPin({
   return null;
 }
 
+const DISTANCE_OPTIONS = [
+  { value: "", label: "Sin límite (priorizo cercanía igual, pero acepto cualquier distancia)" },
+  { value: "1", label: "Hasta 1 km" },
+  { value: "5", label: "Hasta 5 km" },
+  { value: "10", label: "Hasta 10 km" },
+  { value: "25", label: "Hasta 25 km" },
+  { value: "50", label: "Hasta 50 km" },
+];
+
 export function LocationPicker({
   initialLocation,
   initialLat,
   initialLng,
+  initialMaxDistanceKm,
 }: {
   initialLocation: string | null;
   initialLat: number | null;
   initialLng: number | null;
+  initialMaxDistanceKm: number | null;
 }) {
   const [position, setPosition] = useState<[number, number]>(
     initialLat !== null && initialLng !== null
@@ -69,6 +80,9 @@ export function LocationPicker({
     null,
   );
   const [hasPin, setHasPin] = useState(initialLat !== null && initialLng !== null);
+  const [maxDistanceKm, setMaxDistanceKm] = useState(
+    initialMaxDistanceKm !== null ? String(initialMaxDistanceKm) : "",
+  );
 
   async function reverseGeocode(lat: number, lng: number) {
     setLoading("reverse");
@@ -196,6 +210,30 @@ export function LocationPicker({
           placeholder="Dirección (se completa sola al marcar el mapa)"
           className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/30"
         />
+
+        <div>
+          <label className="mb-1 block text-xs font-medium text-stone-600">
+            Radio máximo para trueques (opcional)
+          </label>
+          <select
+            name="max_distance_km"
+            value={maxDistanceKm}
+            onChange={(event) => setMaxDistanceKm(event.target.value)}
+            className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/30"
+          >
+            {DISTANCE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-stone-400">
+            Por defecto siempre priorizamos los trueques más cercanos. Si
+            elegís un radio, directamente no te proponemos trueques más
+            lejos que eso.
+          </p>
+        </div>
+
         <button
           type="submit"
           className="self-start rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800"

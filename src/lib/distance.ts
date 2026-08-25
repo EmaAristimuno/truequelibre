@@ -19,3 +19,7 @@ export function haversineKm(
 
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(h));
 }
+
+export function formatDistanceKm(km: number): string {
+  return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
+}

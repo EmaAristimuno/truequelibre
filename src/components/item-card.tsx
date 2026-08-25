@@ -1,10 +1,7 @@
 import Image from "next/image";
 import { MapPin, Star, ArrowLeftRight, Navigation } from "lucide-react";
 import { CONDITION_LABEL, type Item } from "@/lib/types";
-
-function formatDistance(km: number): string {
-  return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
-}
+import { formatDistanceKm } from "@/lib/distance";
 
 export function ItemCard({ item }: { item: Item }) {
   return (
@@ -27,7 +24,7 @@ export function ItemCard({ item }: { item: Item }) {
         {item.distanceKm !== undefined && (
           <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-emerald-700 shadow-sm">
             <Navigation className="h-3 w-3" />
-            {formatDistance(item.distanceKm)}
+            {formatDistanceKm(item.distanceKm)}
           </span>
         )}
       </div>

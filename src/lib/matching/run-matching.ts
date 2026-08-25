@@ -6,6 +6,11 @@ import { findTradeCycles, type MatchableItem } from "@/lib/matching/find-cycles"
  * Corre el algoritmo contra todos los items disponibles y persiste cada
  * ciclo encontrado como un match + sus legs, reservando (status: 'matched')
  * los items involucrados para que no entren en otro ciclo a la vez.
+ *
+ * La cercanía entre los dueños es siempre el criterio de orden principal
+ * (findTradeCycles ya devuelve los ciclos ordenados por distancia total),
+ * y el radio máximo que cada usuario haya configurado actúa como filtro
+ * duro: ese ciclo directamente no se genera si lo excede.
  */
 export async function runMatching(): Promise<{ createdMatches: number }> {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -24,20 +29,35 @@ export async function runMatching(): Promise<{ createdMatches: number }> {
     return { createdMatches: 0 };
   }
 
-  const matchable: MatchableItem[] = items.map((item) => ({
-    id: item.id,
-    ownerId: item.owner_id,
-    category: item.category,
-    lookingFor: item.looking_for_categories,
-  }));
+  const ownerIds = [...new Set(items.map((item) => item.owner_id))];
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("id, latitude, longitude, max_distance_km")
+    .in("id", ownerIds);
 
-  // Priorizamos ciclos más cortos (bilaterales) antes que cadenas largas.
-  const cycles = findTradeCycles(matchable).sort((a, b) => a.length - b.length);
+  const profileById = new Map(profiles?.map((profile) => [profile.id, profile]));
+
+  const matchable: MatchableItem[] = items.map((item) => {
+    const profile = profileById.get(item.owner_id);
+    return {
+      id: item.id,
+      ownerId: item.owner_id,
+      category: item.category,
+      lookingFor: item.looking_for_categories,
+      lat: profile?.latitude ?? undefined,
+      lng: profile?.longitude ?? undefined,
+      maxDistanceKm: profile?.max_distance_km ?? undefined,
+    };
+  });
+
+  // Ya vienen ordenados por cercanía primero, cantidad de personas después.
+  const cycles = findTradeCycles(matchable);
 
   const reservedItemIds = new Set<string>();
   let createdMatches = 0;
 
-  for (const legs of cycles) {
+  for (const cycle of cycles) {
+    const { legs } = cycle;
     if (legs.some((leg) => reservedItemIds.has(leg.itemId))) continue;
 
     const { data: match, error: matchError } = await supabase
@@ -54,6 +74,7 @@ export async function runMatching(): Promise<{ createdMatches: number }> {
         giver_id: leg.giverId,
         receiver_id: leg.receiverId,
         item_id: leg.itemId,
+        distance_km: leg.distanceKm ?? null,
       })),
     );
 

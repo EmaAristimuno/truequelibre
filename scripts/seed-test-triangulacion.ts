@@ -30,11 +30,11 @@ async function runMatching(supabase: ReturnType<typeof createAdminClient>) {
     lookingFor: item.looking_for_categories,
   }));
 
-  const cycles = findTradeCycles(matchable).sort((a, b) => a.length - b.length);
+  const cycles = findTradeCycles(matchable); // ya vienen ordenados por cercanía
   const reserved = new Set<string>();
   let createdMatches = 0;
 
-  for (const legs of cycles) {
+  for (const { legs } of cycles) {
     if (legs.some((leg) => reserved.has(leg.itemId))) continue;
 
     const { data: match, error: matchError } = await supabase
@@ -50,6 +50,7 @@ async function runMatching(supabase: ReturnType<typeof createAdminClient>) {
         giver_id: leg.giverId,
         receiver_id: leg.receiverId,
         item_id: leg.itemId,
+        distance_km: leg.distanceKm ?? null,
       })),
     );
     if (legsError) {
