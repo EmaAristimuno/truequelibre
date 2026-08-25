@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function acceptMatch(formData: FormData) {
   const matchId = String(formData.get("match_id") ?? "");
@@ -40,6 +41,7 @@ export async function acceptMatch(formData: FormData) {
   }
 
   revalidatePath("/matches");
+  revalidatePath(`/matches/${matchId}`);
 }
 
 export async function confirmDelivery(formData: FormData) {
@@ -74,13 +76,53 @@ export async function confirmDelivery(formData: FormData) {
   );
 
   if (legs && allReceived) {
-    await supabase.from("matches").update({ status: "completed" }).eq("id", matchId);
-    await supabase
+    // El match y los items pueden pertenecer a más de un dueño distinto del
+    // que dispara esta acción: usamos el cliente admin para poder cerrar
+    // el trueque para TODAS las partes, no solo la propia.
+    const admin = createAdminClient();
+    await admin.from("matches").update({ status: "completed" }).eq("id", matchId);
+    await admin
       .from("items")
       .update({ status: "completed" })
-      .in("id", legs.map((leg) => leg.item_id));
+      .in(
+        "id",
+        legs.map((leg) => leg.item_id),
+      );
   }
 
   revalidatePath("/matches");
   revalidatePath(`/matches/${matchId}`);
+}
+
+export async function cancelMatch(formData: FormData) {
+  const matchId = String(formData.get("match_id") ?? "");
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+
+  if (!userData.user) {
+    redirect("/login?next=/matches");
+  }
+
+  // RLS en match_legs solo deja ver legs de matches donde el usuario
+  // participa: si esto viene vacío, no es parte del trueque y no hacemos nada.
+  const { data: legs } = await supabase
+    .from("match_legs")
+    .select("item_id")
+    .eq("match_id", matchId);
+
+  if (legs && legs.length > 0) {
+    const admin = createAdminClient();
+    await admin.from("matches").update({ status: "cancelled" }).eq("id", matchId);
+    await admin
+      .from("items")
+      .update({ status: "available" })
+      .in(
+        "id",
+        legs.map((leg) => leg.item_id),
+      );
+  }
+
+  revalidatePath("/matches");
+  revalidatePath(`/matches/${matchId}`);
+  redirect("/matches");
 }

@@ -4,8 +4,10 @@ import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getMatchById } from "@/lib/queries/matches";
 import { getMatchMessages } from "@/lib/queries/messages";
+import { getRatedUserIds } from "@/lib/queries/ratings";
 import { MatchActions } from "@/components/match-actions";
 import { ChatPanel } from "@/components/chat-panel";
+import { RatingForm } from "@/components/rating-form";
 
 const STATUS_LABEL: Record<string, string> = {
   proposed: "Propuesto",
@@ -40,6 +42,19 @@ export default async function MatchDetailPage({
     participantNames[leg.giverId] = leg.giverName;
     participantNames[leg.receiverId] = leg.receiverName;
   });
+
+  const otherParticipantIds = Object.keys(participantNames).filter(
+    (participantId) => participantId !== user.id,
+  );
+
+  const ratedUserIds =
+    match.status === "completed"
+      ? await getRatedUserIds(id, user.id)
+      : new Set<string>();
+
+  const pendingRatings = otherParticipantIds.filter(
+    (participantId) => !ratedUserIds.has(participantId),
+  );
 
   return (
     <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
@@ -85,6 +100,19 @@ export default async function MatchDetailPage({
           <MatchActions match={match} userId={user.id} />
         </div>
       </div>
+
+      {match.status === "completed" && pendingRatings.length > 0 && (
+        <div className="mt-6 flex flex-col gap-3">
+          {pendingRatings.map((participantId) => (
+            <RatingForm
+              key={participantId}
+              matchId={id}
+              rateeId={participantId}
+              rateeName={participantNames[participantId]}
+            />
+          ))}
+        </div>
+      )}
 
       <ChatPanel
         matchId={id}
