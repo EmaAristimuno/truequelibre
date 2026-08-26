@@ -242,7 +242,7 @@ export async function acceptMatch(formData: FormData) {
 
   const { data: legs } = await supabase
     .from("match_legs")
-    .select("giver_id, giver_confirmed, receiver_confirmed")
+    .select("item_id, giver_id, giver_confirmed, receiver_confirmed")
     .eq("match_id", matchId);
 
   const allConfirmed = legs?.every(
@@ -250,7 +250,33 @@ export async function acceptMatch(formData: FormData) {
   );
 
   if (legs && allConfirmed) {
-    await supabase.from("matches").update({ status: "accepted" }).eq("id", matchId);
+    // Recién ahora el trueque está confirmado por todas las partes: se
+    // reservan los items (dejan de estar "available" para otros) y
+    // cualquier otra propuesta pendiente que compitiera por ellos queda
+    // sin efecto (mismo criterio que selectProposal para propuestas
+    // manuales). Como los items pueden pertenecer a otros dueños, usamos
+    // el cliente admin.
+    const admin = createAdminClient();
+    const itemIds = legs.map((leg) => leg.item_id);
+
+    await admin.from("matches").update({ status: "accepted" }).eq("id", matchId);
+    await admin.from("items").update({ status: "matched" }).in("id", itemIds);
+
+    const { data: competingLegs } = await admin
+      .from("match_legs")
+      .select("match_id")
+      .in("item_id", itemIds)
+      .neq("match_id", matchId);
+
+    const competingMatchIds = [...new Set(competingLegs?.map((leg) => leg.match_id) ?? [])];
+    if (competingMatchIds.length > 0) {
+      await admin
+        .from("matches")
+        .update({ status: "cancelled" })
+        .in("id", competingMatchIds)
+        .eq("status", "proposed");
+    }
+
     const participantIds = [...new Set(legs.map((leg) => leg.giver_id))];
     await notifyMatchAccepted(matchId, participantIds);
   }

@@ -2,7 +2,7 @@
 
 Documento de referencia para entender qué hace la plataforma, cómo funciona cada parte, y qué rol cumple cada tipo de usuario. Se irá actualizando a medida que se agreguen funcionalidades.
 
-**Última actualización:** 2026-08-25
+**Última actualización:** 2026-08-26
 
 ---
 
@@ -62,7 +62,8 @@ Es el corazón del producto. Funciona así, en términos simples:
 3. Soporta:
    - **Trueque bilateral** (2 personas, el caso simple: "yo te doy lo mío, vos me das lo tuyo").
    - **Trueque en cadena** (3 o más personas, hasta 4 por ahora) — el diferencial de la plataforma frente a un simple marketplace de intercambio.
-4. Cuando encuentra un ciclo válido, crea automáticamente una **propuesta de trueque** y **reserva** los objetos involucrados (pasan a estado **En trueque**, dejan de aparecer como disponibles para otros).
+4. Cuando encuentra un ciclo válido, crea automáticamente una **propuesta de trueque** (estado **Propuesto**). **Los objetos involucrados NO se reservan todavía**: siguen apareciendo como **Disponibles** en el feed y cualquier otra persona puede seguir viéndolos, proponerles un trueque manual, o incluso quedar involucrada en otro ciclo automático mientras nadie confirmó este. Recién se reservan (pasan a **En trueque**, dejan de estar disponibles) cuando **todas** las partes confirman el trueque (sección 5). Esto evita que un objeto quede bloqueado por una propuesta que nadie llegó a aceptar.
+   - Para que el algoritmo no vuelva a proponer el mismo ciclo (o uno en conflicto) en cada corrida, un objeto que ya tiene un trueque **Propuesto** o **Aceptado** en curso queda excluido de nuevas búsquedas automáticas, aunque su estado siga siendo Disponible.
 5. **La cercanía manda por defecto**: si hay varios trueques posibles para los mismos objetos, siempre se prioriza el de menor distancia total entre las partes. Recién si hay un empate en distancia (o nadie cargó ubicación) se prioriza el más simple (bilateral antes que cadena larga).
 6. **Radio máximo (opcional, lo configura cada usuario)**: en su perfil, cualquiera puede poner un límite de distancia ("no me interesan trueques a más de X km"). Si lo configura, el algoritmo **directamente no le propone** trueques que superen ese radio — no es solo una preferencia de orden, es un filtro duro. Sin ubicación cargada de ambas partes, no se puede verificar el radio, así que ese trueque tampoco se propone.
 
@@ -72,9 +73,9 @@ Es el corazón del producto. Funciona así, en términos simples:
 
 Además del algoritmo automático, cualquier usuario puede entrar al detalle de un objeto disponible de otra persona y **proponerle un trueque manualmente**, eligiendo cuál de sus propios objetos disponibles ofrece a cambio.
 
-La diferencia clave con el matching automático: **una propuesta manual no reserva los objetos de entrada**. El objeto pedido sigue apareciendo como Disponible para que, si varias personas lo quieren, todas puedan proponer. El dueño del objeto ve todas las propuestas que le llegaron (con qué le ofrece cada uno) y elige una:
+Igual que con el matching automático (sección 4), **una propuesta manual no reserva los objetos de entrada**: el objeto pedido sigue apareciendo como Disponible para que, si varias personas lo quieren, todas puedan proponer. El dueño del objeto ve todas las propuestas que le llegaron (con qué le ofrece cada uno) y elige una:
 
-- Al **aceptar** una propuesta, recién ahí ambos objetos pasan a estado **En trueque**, cualquier otra propuesta pendiente sobre esos mismos objetos queda automáticamente **Rechazada**, y el trueque sigue el mismo camino que uno automático (sección 5: cada parte debe confirmar para que quede Aceptado).
+- Al **elegir** una propuesta entre las que le llegaron, recién ahí ambos objetos pasan a estado **En trueque** y cualquier otra propuesta pendiente sobre esos mismos objetos queda automáticamente **Rechazada**. A diferencia de un match automático (que se reserva recién cuando *todas* las partes confirman, ver sección 5), acá la reserva ocurre en el momento de la **elección del dueño**, un paso antes: el trueque sigue el mismo camino después (cada parte debe presionar "Aceptar trueque" para que quede Aceptado).
 - Al **rechazar** una propuesta puntual, esa propuesta queda cerrada y el objeto sigue disponible para otras.
 
 Quien propone puede seguir el estado de sus propuestas enviadas (Pendiente / Aceptada / Rechazada) desde su perfil.
@@ -83,11 +84,11 @@ Quien propone puede seguir el estado de sus propuestas enviadas (Pendiente / Ace
 
 ## 5. Aceptar un trueque propuesto
 
-Cuando el algoritmo genera una propuesta, cada participante la ve en su sección "Mis trueques", con el detalle completo de la cadena (quién le da qué a quién).
+Cuando el algoritmo genera una propuesta, cada participante la ve en su sección "Mis trueques", con el detalle completo de la cadena (quién le da qué a quién). "Mis trueques" es un acceso siempre visible en el header (con un contador de trueques activos), y además la ficha de cada objeto con un trueque propuesto o aceptado muestra un aviso directo con acceso a ese trueque — para que una propuesta nunca quede "perdida" para el usuario.
 
 - Cada usuario debe presionar **"Aceptar trueque"** para confirmar su parte.
-- El trueque queda con estado **Propuesto** hasta que **todas** las partes confirmen.
-- Cuando todos confirman, el estado pasa a **Aceptado**.
+- El trueque queda con estado **Propuesto** hasta que **todas** las partes confirmen. Mientras tanto (si fue generado por el algoritmo automático), los objetos siguen **Disponibles** — ver sección 4.
+- Cuando todos confirman, el estado pasa a **Aceptado** y **recién ahí** los objetos involucrados se reservan (pasan a **En trueque**, dejan de estar disponibles para otros). Si algún objeto tenía otras propuestas pendientes en simultáneo, esas quedan automáticamente **Rechazadas**.
 
 ### 5.1 Confirmación de entrega (segundo paso)
 

@@ -5,8 +5,11 @@ import { notifyMatchProposed } from "@/lib/email/notify";
 
 /**
  * Corre el algoritmo contra todos los items disponibles y persiste cada
- * ciclo encontrado como un match + sus legs, reservando (status: 'matched')
- * los items involucrados para que no entren en otro ciclo a la vez.
+ * ciclo encontrado como un match ("proposed") + sus legs. Los items NO se
+ * reservan (siguen "available") hasta que el trueque sea aceptado por
+ * todas las partes (ver acceptMatch en actions/matches.ts): mientras el
+ * match está solo propuesto, el objeto sigue visible y ofrecible por
+ * cualquier otra persona.
  *
  * La cercanía entre los dueños es siempre el criterio de orden principal
  * (findTradeCycles ya devuelve los ciclos ordenados por distancia total),
@@ -21,12 +24,37 @@ export async function runMatching(): Promise<{ createdMatches: number }> {
 
   const supabase = createAdminClient();
 
-  const { data: items, error: itemsError } = await supabase
+  const { data: allItems, error: itemsError } = await supabase
     .from("items")
     .select("id, owner_id, category, looking_for_categories")
     .eq("status", "available");
 
-  if (itemsError || !items || items.length < 2) {
+  if (itemsError || !allItems || allItems.length < 2) {
+    return { createdMatches: 0 };
+  }
+
+  // Un objeto sigue "available" (visible y ofrecible por otros) mientras su
+  // trueque no esté confirmado por ambas partes — pero no por eso el
+  // algoritmo debe volver a proponerlo: si ya tiene un match pendiente o
+  // aceptado, lo sacamos del pool para no generar ciclos duplicados o en
+  // conflicto en cada corrida.
+  const { data: activeMatches } = await supabase
+    .from("matches")
+    .select("id")
+    .in("status", ["proposed", "accepted"]);
+
+  const activeMatchIds = (activeMatches ?? []).map((match) => match.id);
+  let alreadyMatchedItemIds = new Set<string>();
+  if (activeMatchIds.length > 0) {
+    const { data: activeLegs } = await supabase
+      .from("match_legs")
+      .select("item_id")
+      .in("match_id", activeMatchIds);
+    alreadyMatchedItemIds = new Set((activeLegs ?? []).map((leg) => leg.item_id));
+  }
+
+  const items = allItems.filter((item) => !alreadyMatchedItemIds.has(item.id));
+  if (items.length < 2) {
     return { createdMatches: 0 };
   }
 
@@ -83,14 +111,6 @@ export async function runMatching(): Promise<{ createdMatches: number }> {
       await supabase.from("matches").delete().eq("id", match.id);
       continue;
     }
-
-    await supabase
-      .from("items")
-      .update({ status: "matched" })
-      .in(
-        "id",
-        legs.map((leg) => leg.itemId),
-      );
 
     legs.forEach((leg) => reservedItemIds.add(leg.itemId));
     createdMatches += 1;

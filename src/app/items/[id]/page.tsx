@@ -65,8 +65,7 @@ export default async function ItemDetailPage({
     );
   }
 
-  const activeMatchId =
-    item.status === "matched" ? await getActiveMatchIdForItem(item.id) : null;
+  const activeMatchId = await getActiveMatchIdForItem(item.id);
 
   return (
     <div className="mx-auto w-full max-w-xl flex-1 px-4 py-10">

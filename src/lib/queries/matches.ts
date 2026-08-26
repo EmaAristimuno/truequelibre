@@ -150,8 +150,10 @@ export async function getActiveMatchCount(userId: string): Promise<number> {
 }
 
 // Para mostrar en la ficha del objeto un banner directo hacia el trueque
-// cuando el algoritmo lo reservó (status "matched"), que si no queda
-// invisible fuera de /matches.
+// automático que le propusieron (aunque el item siga "available" mientras
+// no se confirme), o hacia el que ya se aceptó. Una propuesta manual
+// todavía sin seleccionar (ver selectProposal) NO cuenta acá: esa la
+// maneja el dueño desde PendingProposalsCard, para no duplicar la acción.
 export async function getActiveMatchIdForItem(itemId: string): Promise<string | null> {
   const supabase = await createClient();
 
@@ -165,12 +167,14 @@ export async function getActiveMatchIdForItem(itemId: string): Promise<string | 
 
   const { data: matches } = await supabase
     .from("matches")
-    .select("id, status")
+    .select("id, status, initiated_by")
     .in("id", matchIds)
     .order("created_at", { ascending: false });
 
   const active = matches?.find(
-    (match) => match.status === "proposed" || match.status === "accepted",
+    (match) =>
+      match.status === "accepted" ||
+      (match.status === "proposed" && !match.initiated_by),
   );
   return active?.id ?? null;
 }
