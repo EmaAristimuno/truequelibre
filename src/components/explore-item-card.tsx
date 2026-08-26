@@ -9,7 +9,7 @@ export function ExploreItemCard({ item }: { item: Item }) {
     <article className="group flex flex-col overflow-hidden rounded-[22px] border border-ink/10 bg-white shadow-[0_1px_0_rgba(35,40,31,0.05)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_30px_-18px_rgba(35,40,31,0.35)]">
       <Link
         href={`/items/${item.id}`}
-        className="relative flex h-44 items-center justify-center overflow-hidden bg-gradient-to-br from-pine/15 via-paper-dim to-gold/15 text-6xl"
+        className="relative flex h-44 items-center justify-center overflow-hidden bg-linear-to-br from-pine/15 via-paper-dim to-gold/15 text-6xl"
       >
         {item.imageUrl ? (
           <Image

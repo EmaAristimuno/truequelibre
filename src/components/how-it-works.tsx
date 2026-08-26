@@ -37,7 +37,7 @@ export function HowItWorks() {
         <div className="relative mt-12 grid grid-cols-1 gap-10 sm:grid-cols-3">
           <div
             aria-hidden
-            className="absolute left-0 right-0 top-7 hidden h-px bg-gradient-to-r from-transparent via-moss to-transparent sm:block"
+            className="absolute left-0 right-0 top-7 hidden h-px bg-linear-to-r from-transparent via-moss to-transparent sm:block"
           />
           {STEPS.map((step, index) => (
             <div key={step.title} className="relative text-center">
