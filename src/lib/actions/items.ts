@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { runMatching } from "@/lib/matching/run-matching";
+import { getActiveMatchIdForItem } from "@/lib/queries/matches";
 import { MAX_IMAGES, MAX_IMAGE_BYTES } from "@/lib/image-limits";
 import type { ItemCondition } from "@/lib/types";
 
@@ -86,24 +87,33 @@ export async function createItem(formData: FormData) {
   const coverToken = String(formData.get("cover") ?? "");
   const images = reorderWithCover([], newImages, coverToken);
 
-  const { error } = await supabase.from("items").insert({
-    owner_id: user.id,
-    title,
-    description,
-    category,
-    condition,
-    images,
-    looking_for_categories: lookingForCategories,
-    looking_for_description: lookingForDescription,
-  });
+  const { data: newItem, error } = await supabase
+    .from("items")
+    .insert({
+      owner_id: user.id,
+      title,
+      description,
+      category,
+      condition,
+      images,
+      looking_for_categories: lookingForCategories,
+      looking_for_description: lookingForDescription,
+    })
+    .select("id")
+    .single();
 
-  if (error) {
-    redirect(`/publicar?error=${encodeURIComponent(error.message)}`);
+  if (error || !newItem) {
+    redirect(`/publicar?error=${encodeURIComponent(error?.message ?? "Error al publicar")}`);
   }
 
   const { createdMatches } = await runMatching();
 
-  redirect(createdMatches > 0 ? "/matches?found=1" : "/?published=1");
+  if (createdMatches > 0) {
+    const matchId = await getActiveMatchIdForItem(newItem.id);
+    redirect(matchId ? `/matches/${matchId}?found=1` : "/matches?found=1");
+  }
+
+  redirect("/?published=1");
 }
 
 export type UpdateItemState = { success: boolean; error?: string } | null;

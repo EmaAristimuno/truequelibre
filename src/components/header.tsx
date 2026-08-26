@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Recycle, Plus } from "lucide-react";
+import { Recycle, Plus, Repeat } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { UserMenu } from "@/components/user-menu";
+import { getActiveMatchCount } from "@/lib/queries/matches";
 
 export async function Header() {
   const supabase = await createClient();
@@ -10,6 +11,7 @@ export async function Header() {
 
   let username: string | null = null;
   let isAdmin = false;
+  let activeMatchCount = 0;
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
@@ -18,6 +20,7 @@ export async function Header() {
       .single();
     username = profile?.username ?? null;
     isAdmin = profile?.is_admin === true;
+    activeMatchCount = await getActiveMatchCount(user.id);
   }
 
   return (
@@ -42,6 +45,22 @@ export async function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
+          {user && (
+            <Link
+              href="/matches"
+              aria-label="Mis trueques"
+              className="relative flex h-9 w-9 items-center justify-center rounded-full text-ink/70 transition-colors hover:bg-ink/5 hover:text-ink sm:h-auto sm:w-auto sm:gap-1.5 sm:rounded-full sm:px-3 sm:py-2 sm:text-sm sm:font-medium"
+            >
+              <Repeat className="h-5 w-5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Mis trueques</span>
+              {activeMatchCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-clay px-1 text-[10px] font-bold leading-none text-white sm:static sm:ml-0.5 sm:-mr-0.5">
+                  {activeMatchCount}
+                </span>
+              )}
+            </Link>
+          )}
+
           {user ? (
             <UserMenu username={username ?? "Mi perfil"} isAdmin={isAdmin} />
           ) : (

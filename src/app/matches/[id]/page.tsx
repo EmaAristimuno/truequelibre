@@ -16,10 +16,10 @@ export default async function MatchDetailPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ selected?: string }>;
+  searchParams: Promise<{ selected?: string; found?: string }>;
 }) {
   const { id } = await params;
-  const { selected } = await searchParams;
+  const { selected, found } = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
   const user = data.user;
@@ -63,6 +63,12 @@ export default async function MatchDetailPage({
         <ArrowLeft className="h-4 w-4" />
         Mis trueques
       </Link>
+
+      {found && (
+        <p className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+          ¡Encontramos un posible trueque para tu objeto! Revisalo acá abajo.
+        </p>
+      )}
 
       {selected && (
         <p className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">

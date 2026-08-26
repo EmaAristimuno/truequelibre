@@ -1,10 +1,11 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Repeat } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getItemDetail } from "@/lib/queries/item-detail";
 import { getMyItems } from "@/lib/queries/my-items";
 import { getPendingProposalsForItem } from "@/lib/queries/proposals";
+import { getActiveMatchIdForItem } from "@/lib/queries/matches";
 import { EditItemForm } from "@/components/edit-item-form";
 import { BoostItemCard } from "@/components/boost-item-card";
 import { PublicItemView } from "@/components/public-item-view";
@@ -64,6 +65,9 @@ export default async function ItemDetailPage({
     );
   }
 
+  const activeMatchId =
+    item.status === "matched" ? await getActiveMatchIdForItem(item.id) : null;
+
   return (
     <div className="mx-auto w-full max-w-xl flex-1 px-4 py-10">
       <Link
@@ -91,6 +95,19 @@ export default async function ItemDetailPage({
         <p className="mt-4 rounded-lg bg-stone-100 px-3 py-2 text-sm text-stone-600">
           Rechazaste esa propuesta.
         </p>
+      )}
+
+      {activeMatchId && (
+        <Link
+          href={`/matches/${activeMatchId}`}
+          className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800 transition-colors hover:border-emerald-300"
+        >
+          <span className="flex items-center gap-2">
+            <Repeat className="h-4 w-4" />
+            ¡Encontramos un trueque para este objeto!
+          </span>
+          <span>Ver trueque →</span>
+        </Link>
       )}
 
       <PendingProposalsCard proposals={await getPendingProposalsForItem(item.id)} />

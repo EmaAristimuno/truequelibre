@@ -140,6 +140,41 @@ export async function getMyMatches(userId: string): Promise<MatchView[]> {
   );
 }
 
+// Para el badge de "Mis trueques" en el header: cuenta los trueques que
+// todavía requieren atención del usuario (no completados ni cancelados).
+export async function getActiveMatchCount(userId: string): Promise<number> {
+  const matches = await getMyMatches(userId);
+  return matches.filter(
+    (match) => match.status === "proposed" || match.status === "accepted",
+  ).length;
+}
+
+// Para mostrar en la ficha del objeto un banner directo hacia el trueque
+// cuando el algoritmo lo reservó (status "matched"), que si no queda
+// invisible fuera de /matches.
+export async function getActiveMatchIdForItem(itemId: string): Promise<string | null> {
+  const supabase = await createClient();
+
+  const { data: legs } = await supabase
+    .from("match_legs")
+    .select("match_id")
+    .eq("item_id", itemId);
+
+  const matchIds = [...new Set((legs ?? []).map((leg) => leg.match_id))];
+  if (matchIds.length === 0) return null;
+
+  const { data: matches } = await supabase
+    .from("matches")
+    .select("id, status")
+    .in("id", matchIds)
+    .order("created_at", { ascending: false });
+
+  const active = matches?.find(
+    (match) => match.status === "proposed" || match.status === "accepted",
+  );
+  return active?.id ?? null;
+}
+
 export async function getMatchById(matchId: string): Promise<MatchView | null> {
   const supabase = await createClient();
 
