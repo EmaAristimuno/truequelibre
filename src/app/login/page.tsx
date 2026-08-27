@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Recycle } from "lucide-react";
 import { login } from "@/lib/actions/auth";
+import { SubmitButton } from "@/components/submit-button";
 
 export default async function LoginPage({
   searchParams,
@@ -48,12 +49,12 @@ export default async function LoginPage({
             placeholder="Contraseña"
             className="w-full rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/30"
           />
-          <button
-            type="submit"
-            className="mt-1 w-full rounded-xl bg-emerald-700 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-800"
+          <SubmitButton
+            pendingText="Entrando..."
+            className="mt-1 w-full rounded-xl bg-emerald-700 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Entrar
-          </button>
+          </SubmitButton>
         </form>
 
         <p className="mt-5 text-center text-sm text-stone-500">

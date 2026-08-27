@@ -3,6 +3,7 @@ import Link from "next/link";
 import { MapPin, Star, ArrowLeftRight } from "lucide-react";
 import { proposeTrade } from "@/lib/actions/matches";
 import { CONDITION_LABEL } from "@/lib/types";
+import { SubmitButton } from "@/components/submit-button";
 import type { ItemDetail } from "@/lib/queries/item-detail";
 import type { MyItem } from "@/lib/queries/my-items";
 
@@ -118,12 +119,12 @@ export function PublicItemView({
                 </option>
               ))}
             </select>
-            <button
-              type="submit"
-              className="rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-800"
+            <SubmitButton
+              pendingText="Enviando..."
+              className="rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
               Proponer trueque
-            </button>
+            </SubmitButton>
           </form>
         )}
       </div>

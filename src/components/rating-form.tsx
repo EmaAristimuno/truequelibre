@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Star } from "lucide-react";
 import { submitRating } from "@/lib/actions/ratings";
+import { SubmitButton } from "@/components/submit-button";
 
 export function RatingForm({
   matchId,
@@ -56,13 +57,13 @@ export function RatingForm({
         className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/30"
       />
 
-      <button
-        type="submit"
+      <SubmitButton
         disabled={score === 0}
-        className="self-start rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 disabled:opacity-40"
+        pendingText="Enviando..."
+        className="self-start rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-40"
       >
         Enviar calificación
-      </button>
+      </SubmitButton>
     </form>
   );
 }

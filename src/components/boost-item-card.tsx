@@ -1,6 +1,7 @@
 import { Rocket } from "lucide-react";
 import { createFeatureOrder } from "@/lib/actions/payments";
 import { BOOST_PRICE_USD, BOOST_DURATION_DAYS } from "@/lib/boost";
+import { SubmitButton } from "@/components/submit-button";
 
 export function BoostItemCard({
   itemId,
@@ -41,12 +42,12 @@ export function BoostItemCard({
       {!isFeatured && status === "available" && (
         <form action={createFeatureOrder}>
           <input type="hidden" name="item_id" value={itemId} />
-          <button
-            type="submit"
-            className="shrink-0 rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-600"
+          <SubmitButton
+            pendingText="Redirigiendo..."
+            className="shrink-0 rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Destacar
-          </button>
+          </SubmitButton>
         </form>
       )}
     </div>

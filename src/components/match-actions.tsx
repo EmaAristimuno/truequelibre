@@ -1,6 +1,7 @@
 import { CheckCircle2, XCircle } from "lucide-react";
 import { acceptMatch, confirmDelivery, cancelMatch } from "@/lib/actions/matches";
 import type { MatchView } from "@/lib/queries/matches";
+import { SubmitButton } from "@/components/submit-button";
 
 export function MatchActions({
   match,
@@ -28,10 +29,13 @@ export function MatchActions({
   const cancelButton = (
     <form action={cancelMatch}>
       <input type="hidden" name="match_id" value={match.id} />
-      <button className="flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700">
+      <SubmitButton
+        pendingText="Rechazando..."
+        className="flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+      >
         <XCircle className="h-4 w-4" />
         Rechazar
-      </button>
+      </SubmitButton>
     </form>
   );
 
@@ -45,9 +49,12 @@ export function MatchActions({
         ) : (
           <form action={acceptMatch}>
             <input type="hidden" name="match_id" value={match.id} />
-            <button className="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800">
+            <SubmitButton
+              pendingText="Confirmando..."
+              className="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+            >
               Aceptar trueque
-            </button>
+            </SubmitButton>
           </form>
         )}
         {cancelButton}
@@ -65,9 +72,12 @@ export function MatchActions({
         ) : (
           <form action={confirmDelivery}>
             <input type="hidden" name="match_id" value={match.id} />
-            <button className="rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-600">
+            <SubmitButton
+              pendingText="Confirmando..."
+              className="rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-60"
+            >
               Confirmar que recibí mi objeto
-            </button>
+            </SubmitButton>
           </form>
         )}
         {cancelButton}

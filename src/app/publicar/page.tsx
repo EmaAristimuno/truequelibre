@@ -4,6 +4,7 @@ import { createItem } from "@/lib/actions/items";
 import { CATEGORIES } from "@/lib/categories";
 import { CONDITION_LABEL } from "@/lib/types";
 import { ImageUploader } from "@/components/image-uploader";
+import { SubmitButton } from "@/components/submit-button";
 
 export default async function PublicarPage({
   searchParams,
@@ -140,12 +141,12 @@ export default async function PublicarPage({
           />
         </div>
 
-        <button
-          type="submit"
-          className="mt-2 w-full rounded-xl bg-amber-500 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-600"
+        <SubmitButton
+          pendingText="Publicando..."
+          className="mt-2 w-full rounded-xl bg-amber-500 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
           Publicar objeto
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );

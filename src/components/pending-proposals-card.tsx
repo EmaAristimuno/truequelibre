@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Inbox } from "lucide-react";
 import { selectProposal, rejectProposal } from "@/lib/actions/matches";
 import type { PendingProposal } from "@/lib/queries/proposals";
+import { SubmitButton } from "@/components/submit-button";
 
 export function PendingProposalsCard({ proposals }: { proposals: PendingProposal[] }) {
   if (proposals.length === 0) return null;
@@ -39,21 +40,21 @@ export function PendingProposalsCard({ proposals }: { proposals: PendingProposal
             </div>
             <form action={selectProposal}>
               <input type="hidden" name="match_id" value={proposal.matchId} />
-              <button
-                type="submit"
-                className="shrink-0 rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-800"
+              <SubmitButton
+                pendingText="..."
+                className="shrink-0 rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Aceptar
-              </button>
+              </SubmitButton>
             </form>
             <form action={rejectProposal}>
               <input type="hidden" name="match_id" value={proposal.matchId} />
-              <button
-                type="submit"
-                className="shrink-0 rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-semibold text-stone-600 transition-colors hover:bg-stone-50"
+              <SubmitButton
+                pendingText="..."
+                className="shrink-0 rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-semibold text-stone-600 transition-colors hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Rechazar
-              </button>
+              </SubmitButton>
             </form>
           </div>
         ))}
